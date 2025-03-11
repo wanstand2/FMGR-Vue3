@@ -30,7 +30,7 @@ import com.ruoyi.system.mapper.SysUserRoleMapper;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysDeptService;
 import com.ruoyi.system.service.ISysUserService;
-
+import java.util.Collection;
 /**
  * 用户 业务层处理
  * 
@@ -126,6 +126,11 @@ public class SysUserServiceImpl implements ISysUserService
     public SysUser selectUserById(Long userId)
     {
         return userMapper.selectUserById(userId);
+    }
+
+    @Override
+    public List<SysUser> selectUserByIds(Collection<Long> userIds) {
+        return userMapper.selectUserByIds(userIds);
     }
 
     /**

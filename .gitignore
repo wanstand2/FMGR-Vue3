@@ -41,6 +41,8 @@ nbdist/
 *.log
 *.xml.versionsBackup
 *.swp
+.DS_Store
+.vscode
 
 !*/build/*.java
 !*/build/*.html

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.fmgr.mapper.FmgreSupplierMapper">
+    
+    <resultMap type="FmgreSupplier" id="FmgreSupplierResult">
+        <result property="supplierId"    column="supplier_id"    />
+        <result property="supplierName"    column="supplier_name"    />
+        <result property="supplierCode"    column="supplier_code"    />
+        <result property="supplierDetail"    column="supplier_detail"    />
+        <result property="address"    column="address"    />
+        <result property="contactName"    column="contact_name"    />
+        <result property="contactPhone"    column="contact_phone"    />
+    </resultMap>
+
+    <sql id="selectFmgreSupplierVo">
+        select supplier_id, supplier_name, supplier_code, supplier_detail, address, contact_name, contact_phone from fmgre_supplier
+    </sql>
+
+    <select id="selectFmgreSupplierList" parameterType="FmgreSupplier" resultMap="FmgreSupplierResult">
+        <include refid="selectFmgreSupplierVo"/>
+        <where>  
+            <if test="supplierName != null  and supplierName != ''"> and supplier_name like concat('%', #{supplierName}, '%')</if>
+            <if test="supplierCode != null  and supplierCode != ''"> and supplier_code = #{supplierCode}</if>
+            <if test="supplierDetail != null  and supplierDetail != ''"> and supplier_detail = #{supplierDetail}</if>
+            <if test="address != null  and address != ''"> and address = #{address}</if>
+            <if test="contactName != null  and contactName != ''"> and contact_name like concat('%', #{contactName}, '%')</if>
+            <if test="contactPhone != null  and contactPhone != ''"> and contact_phone = #{contactPhone}</if>
+        </where>
+    </select>
+    
+    <select id="selectFmgreSupplierBySupplierId" parameterType="Long" resultMap="FmgreSupplierResult">
+        <include refid="selectFmgreSupplierVo"/>
+        where supplier_id = #{supplierId}
+    </select>
+
+    <select id="selectFmgreSupplierListBySupplierIds" parameterType="Long[]" resultMap="FmgreSupplierResult">
+        <include refid="selectFmgreSupplierVo"/>
+        where supplier_id in
+        <foreach item="supplierId" collection="array" open="(" separator="," close=")">
+            #{supplierId}
+        </foreach>
+    </select>
+
+    <insert id="insertFmgreSupplier" parameterType="FmgreSupplier" useGeneratedKeys="true" keyProperty="supplierId">
+        insert into fmgre_supplier
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="supplierName != null">supplier_name,</if>
+            <if test="supplierCode != null">supplier_code,</if>
+            <if test="supplierDetail != null">supplier_detail,</if>
+            <if test="address != null">address,</if>
+            <if test="contactName != null">contact_name,</if>
+            <if test="contactPhone != null">contact_phone,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="supplierName != null">#{supplierName},</if>
+            <if test="supplierCode != null">#{supplierCode},</if>
+            <if test="supplierDetail != null">#{supplierDetail},</if>
+            <if test="address != null">#{address},</if>
+            <if test="contactName != null">#{contactName},</if>
+            <if test="contactPhone != null">#{contactPhone},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFmgreSupplier" parameterType="FmgreSupplier">
+        update fmgre_supplier
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="supplierName != null">supplier_name = #{supplierName},</if>
+            <if test="supplierCode != null">supplier_code = #{supplierCode},</if>
+            <if test="supplierDetail != null">supplier_detail = #{supplierDetail},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="contactName != null">contact_name = #{contactName},</if>
+            <if test="contactPhone != null">contact_phone = #{contactPhone},</if>
+        </trim>
+        where supplier_id = #{supplierId}
+    </update>
+
+    <delete id="deleteFmgreSupplierBySupplierId" parameterType="Long">
+        delete from fmgre_supplier where supplier_id = #{supplierId}
+    </delete>
+
+    <delete id="deleteFmgreSupplierBySupplierIds" parameterType="String">
+        delete from fmgre_supplier where supplier_id in 
+        <foreach item="supplierId" collection="array" open="(" separator="," close=")">
+            #{supplierId}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.fmgr.mapper.FmgrePurchaseOrderMapper">
+    
+    <resultMap type="FmgrePurchaseOrder" id="FmgrePurchaseOrderResult">
+        <result property="orderId"    column="order_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="supplierId"    column="supplier_id"    />
+        <result property="orderCode"    column="order_code"    />
+        <result property="deliveryDictid"    column="delivery_dictid"    />
+        <result property="orderTime"    column="order_time"    />
+        <result property="orderTotalPrice"    column="order_total_price"    />
+        <result property="orderComment"    column="order_comment"    />
+        <result property="paymentId"    column="payment_id"    />
+    </resultMap>
+
+    <sql id="selectFmgrePurchaseOrderVo">
+        select order_id, user_id, supplier_id, order_code, delivery_dictid, order_time, order_total_price, order_comment, payment_id from fmgre_purchase_order
+    </sql>
+
+    <select id="selectFmgrePurchaseOrderList" parameterType="FmgrePurchaseOrder" resultMap="FmgrePurchaseOrderResult">
+        <include refid="selectFmgrePurchaseOrderVo"/>
+        <where>  
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="supplierId != null "> and supplier_id = #{supplierId}</if>
+            <if test="orderCode != null  and orderCode != ''"> and materail_code = #{orderCode}</if>
+            <if test="deliveryDictid != null  and deliveryDictid != ''"> and delivery_dictid = #{deliveryDictid}</if>
+            <if test="params.beginOrderTime != null and params.beginOrderTime != '' and params.endOrderTime != null and params.endOrderTime != ''"> and order_time between #{params.beginOrderTime} and #{params.endOrderTime}</if>
+            <if test="orderComment != null  and orderComment != ''"> and order_comment like concat('%', #{orderComment}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectFmgrePurchaseOrderByOrderId" parameterType="Long" resultMap="FmgrePurchaseOrderResult">
+        <include refid="selectFmgrePurchaseOrderVo"/>
+        where order_id = #{orderId}
+    </select>
+
+    <insert id="insertFmgrePurchaseOrder" parameterType="FmgrePurchaseOrder" useGeneratedKeys="true" keyProperty="orderId">
+        insert into fmgre_purchase_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="supplierId != null">supplier_id,</if>
+            <if test="orderCode != null">order_code,</if>
+            <if test="deliveryDictid != null">delivery_dictid,</if>
+            <if test="orderTime != null">order_time,</if>
+            <if test="orderTotalPrice != null">order_total_price,</if>
+            <if test="orderComment != null">order_comment,</if>
+            <if test="paymentId != null">payment_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="supplierId != null">#{supplierId},</if>
+            <if test="orderCode != null">#{orderCode},</if>
+            <if test="deliveryDictid != null">#{deliveryDictid},</if>
+            <if test="orderTime != null">#{orderTime},</if>
+            <if test="orderTotalPrice != null">#{orderTotalPrice},</if>
+            <if test="orderComment != null">#{orderComment},</if>
+            <if test="paymentId != null">#{paymentId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFmgrePurchaseOrder" parameterType="FmgrePurchaseOrder">
+        update fmgre_purchase_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="supplierId != null">supplier_id = #{supplierId},</if>
+            <if test="orderCode != null">materail_code = #{orderCode},</if>
+            <if test="deliveryDictid != null">delivery_dictid = #{deliveryDictid},</if>
+            <if test="orderTime != null">order_time = #{orderTime},</if>
+            <if test="orderTotalPrice != null">order_total_price = #{orderTotalPrice},</if>
+            <if test="orderComment != null">order_comment = #{orderComment},</if>
+            <if test="paymentId != null">payment_id = #{paymentId},</if>
+        </trim>
+        where order_id = #{orderId}
+    </update>
+
+    <delete id="deleteFmgrePurchaseOrderByOrderId" parameterType="Long">
+        delete from fmgre_purchase_order where order_id = #{orderId}
+    </delete>
+
+    <delete id="deleteFmgrePurchaseOrderByOrderIds" parameterType="String">
+        delete from fmgre_purchase_order where order_id in 
+        <foreach item="orderId" collection="array" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </delete>
+</mapper>

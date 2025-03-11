@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.fmgr.mapper.FmgreFinanceAccountMapper">
+    
+    <resultMap type="FmgreFinanceAccount" id="FmgreFinanceAccountResult">
+        <result property="accountId"    column="account_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="accountDictid"    column="account_dictid"    />
+        <result property="accountName"    column="account_name"    />
+        <result property="accountNumber"    column="account_number"    />
+        <result property="bankId"    column="bank_id"    />
+        <result property="bankInfo"    column="bank_info"    />
+    </resultMap>
+
+    <sql id="selectFmgreFinanceAccountVo">
+        select account_id, user_id, dept_id, account_dictid, account_name, account_number, bank_id, bank_info from fmgre_finance_account
+    </sql>
+
+    <select id="selectFmgreFinanceAccountList" parameterType="FmgreFinanceAccount" resultMap="FmgreFinanceAccountResult">
+        <include refid="selectFmgreFinanceAccountVo"/>
+        <where>  
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="accountDictid != null  and accountDictid != ''"> and account_dictid = #{accountDictid}</if>
+            <if test="accountName != null  and accountName != ''"> and account_name like concat('%', #{accountName}, '%')</if>
+            <if test="accountNumber != null  and accountNumber != ''"> and account_number like concat('%', #{accountNumber}, '%')</if>
+            <if test="bankId != null "> and bank_id = #{bankId}</if>
+            <if test="bankInfo != null  and bankInfo != ''"> and bank_info like concat('%', #{bankInfo}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectFmgreFinanceAccountByAccountId" parameterType="Long" resultMap="FmgreFinanceAccountResult">
+        <include refid="selectFmgreFinanceAccountVo"/>
+        where account_id = #{accountId}
+    </select>
+
+    <insert id="insertFmgreFinanceAccount" parameterType="FmgreFinanceAccount" useGeneratedKeys="true" keyProperty="accountId">
+        insert into fmgre_finance_account
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="accountDictid != null">account_dictid,</if>
+            <if test="accountName != null">account_name,</if>
+            <if test="accountNumber != null">account_number,</if>
+            <if test="bankId != null">bank_id,</if>
+            <if test="bankInfo != null">bank_info,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="accountDictid != null">#{accountDictid},</if>
+            <if test="accountName != null">#{accountName},</if>
+            <if test="accountNumber != null">#{accountNumber},</if>
+            <if test="bankId != null">#{bankId},</if>
+            <if test="bankInfo != null">#{bankInfo},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFmgreFinanceAccount" parameterType="FmgreFinanceAccount">
+        update fmgre_finance_account
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="accountDictid != null">account_dictid = #{accountDictid},</if>
+            <if test="accountName != null">account_name = #{accountName},</if>
+            <if test="accountNumber != null">account_number = #{accountNumber},</if>
+            <if test="bankId != null">bank_id = #{bankId},</if>
+            <if test="bankInfo != null">bank_info = #{bankInfo},</if>
+        </trim>
+        where account_id = #{accountId}
+    </update>
+
+    <delete id="deleteFmgreFinanceAccountByAccountId" parameterType="Long">
+        delete from fmgre_finance_account where account_id = #{accountId}
+    </delete>
+
+    <delete id="deleteFmgreFinanceAccountByAccountIds" parameterType="String">
+        delete from fmgre_finance_account where account_id in 
+        <foreach item="accountId" collection="array" open="(" separator="," close=")">
+            #{accountId}
+        </foreach>
+    </delete>
+</mapper>

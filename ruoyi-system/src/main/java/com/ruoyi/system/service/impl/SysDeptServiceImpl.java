@@ -1,11 +1,14 @@
 package com.ruoyi.system.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.TreeSelect;
@@ -125,6 +128,12 @@ public class SysDeptServiceImpl implements ISysDeptService
     {
         return deptMapper.selectDeptById(deptId);
     }
+    
+    @Override
+    public List<SysDept> selectDeptByIds(Collection<Long> deptIds) {
+        return deptMapper.selectDeptByIds(deptIds);
+    }
+
 
     /**
      * 根据ID查询所有子部门（正常状态）
@@ -150,7 +159,6 @@ public class SysDeptServiceImpl implements ISysDeptService
         int result = deptMapper.hasChildByDeptId(deptId);
         return result > 0;
     }
-
     /**
      * 查询部门是否存在用户
      * 

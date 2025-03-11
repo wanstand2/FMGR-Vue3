@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.fmgr.mapper.FmgrePurchaseItemMapper">
+    
+    <resultMap type="FmgrePurchaseItem" id="FmgrePurchaseItemResult">
+        <result property="itemId"    column="item_id"    />
+        <result property="requirId"    column="requir_id"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="materailId"    column="materail_id"    />
+        <result property="requirNum"    column="requir_num"    />
+        <result property="requirUnitDictid"    column="requir_unit_dictid"    />
+        <result property="orderUnitDictid"    column="order_unit_dictid"    />
+        <result property="orderNum"    column="order_num"    />
+        <result property="orderAmount"    column="order_amount"    />
+        <result property="quotaId"    column="quota_id"    />
+        <result property="supplierId"    column="supplier_id"    />
+        <result property="itemTotalPrice"    column="item_total_price"    />
+        <result property="materail.materailTypeDictid"    column="materail_type_dictid"    />
+        <result property="materail.materailCode"    column="materail_code"    />
+        <result property="materail.materailName"    column="materail_name"    />
+        <result property="materail.unitDictid"    column="unit_dictid"    />
+        <result property="materail.valuationAmount"    column="valuation_amount"    />
+        <result property="materail.priceSale"    column="price_sale"    />
+        <result property="materail.storageDictid"    column="storage_dictid"    />
+    </resultMap>
+
+    <resultMap type="FmgrePurchaseRequirSummaryBo" id="FmgrePurchaseRequirSummaryBoResult">
+        <result property="requirId"    column="requir_id"    />
+        <result property="orderNum"    column="order_num"    />
+        <result property="itemNum"    column="item_num"    />
+        <result property="itemTotalPrice"    column="item_total_price"    />
+        <result property="supplierNum"    column="supplier_num"    />
+    </resultMap>
+
+    <sql id="selectFmgrePurchaseItemVo">
+        select 
+            item_id, requir_id, order_id, i.materail_id as materail_id, requir_num, requir_unit_dictid, order_num, order_amount, quota_id, supplier_id, item_total_price,
+            materail_type_dictid, materail_code, materail_name, unit_dictid, valuation_amount, price_sale, storage_dictid, order_unit_dictid
+        from fmgre_purchase_item as i LEFT JOIN fmgre_material as m ON i.materail_id = m.materail_id
+    </sql>
+
+    <select id="selectFmgrePurchaseItemList" parameterType="FmgrePurchaseItem" resultMap="FmgrePurchaseItemResult">
+        <include refid="selectFmgrePurchaseItemVo"/>
+        <where>  
+            <if test="requirId != null "> and requir_id = #{requirId}</if>
+            <if test="orderId != null "> and order_id = #{orderId}</if>
+            <if test="supplierId != null "> and supplier_id = #{supplierId}</if>
+            <if test="materailId != null "> and materail_id = #{materailId}</if>
+            <if test="params.supplierIdNoneZero != null  and params.supplierIdNoneZero != ''"> and supplier_id > 0</if>
+        </where>
+    </select>
+
+    <select id="selectFmgrePurchaseRequirSummaryByRequirIds" parameterType="java.util.Collection" resultMap="FmgrePurchaseRequirSummaryBoResult">
+        select 
+            requir_id, count(item_id) as item_num, sum(item_total_price) as item_total_price, 
+            count(if(order_id > 0, 1, null)) as order_num, 
+            count(if(supplier_id > 0, 1, null)) as supplier_num
+        from fmgre_purchase_item    
+        where requir_id in
+        <foreach item="requirId" collection="list" open="(" separator="," close=")">
+            #{requirId}
+        </foreach>
+        group by requir_id
+    </select>
+    
+    
+    <select id="selectFmgrePurchaseItemByItemIds" parameterType="java.util.Collection" resultMap="FmgrePurchaseItemResult">
+        <include refid="selectFmgrePurchaseItemVo"/>
+        where item_id in
+        <foreach item="itemId" collection="list" open="(" separator="," close=")">
+            #{itemId}
+        </foreach>
+    </select>
+
+    <insert id="insertFmgrePurchaseItem" parameterType="FmgrePurchaseItem" useGeneratedKeys="true" keyProperty="itemId">
+        insert into fmgre_purchase_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="requirId != null">requir_id,</if>
+            <if test="orderId != null">order_id,</if>
+            <if test="materailId != null">materail_id,</if>
+            <if test="requirNum != null">requir_num,</if>
+            <if test="requirUnitDictid != null">requir_unit_dictid,</if>
+            <if test="orderNum != null">order_num,</if>
+            <if test="orderAmount != null">order_amount,</if>
+            <if test="quotaId != null">quota_id,</if>
+            <if test="supplierId != null">supplier_id,</if>
+            <if test="itemTotalPrice != null">item_total_price,</if>
+            <if test="orderUnitDictid != null">order_unit_dictid,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="requirId != null">#{requirId},</if>
+            <if test="orderId != null">#{orderId},</if>
+            <if test="materailId != null">#{materailId},</if>
+            <if test="requirNum != null">#{requirNum},</if>
+            <if test="requirUnitDictid != null">#{requirUnitDictid},</if>
+            <if test="orderNum != null">#{orderNum},</if>
+            <if test="orderAmount != null">#{orderAmount},</if>
+            <if test="quotaId != null">#{quotaId},</if>
+            <if test="supplierId != null">#{supplierId},</if>
+            <if test="itemTotalPrice != null">#{itemTotalPrice},</if>
+            <if test="orderUnitDictid != null">#{orderUnitDictid},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFmgrePurchaseItem" parameterType="FmgrePurchaseItem">
+        update fmgre_purchase_item
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="requirId != null">requir_id = #{requirId},</if>
+            <if test="orderId != null">order_id = #{orderId},</if>
+            <if test="materailId != null">materail_id = #{materailId},</if>
+            <if test="requirNum != null">requir_num = #{requirNum},</if>
+            <if test="requirUnitDictid != null">requir_unit_dictid = #{requirUnitDictid},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="orderAmount != null">order_amount = #{orderAmount},</if>
+            <if test="quotaId != null">quota_id = #{quotaId},</if>
+            <if test="supplierId != null">supplier_id = #{supplierId},</if>
+            <if test="itemTotalPrice != null">item_total_price = #{itemTotalPrice},</if>
+            <if test="orderUnitDictid != null">order_unit_dictid = #{orderUnitDictid},</if>
+        </trim>
+        where item_id = #{itemId}
+    </update>
+
+    <delete id="deleteFmgrePurchaseItemByItemId" parameterType="Long">
+        delete from fmgre_purchase_item where item_id = #{itemId}
+    </delete>
+
+    <delete id="deleteFmgrePurchaseItemByItemIds" parameterType="String">
+        delete from fmgre_purchase_item where item_id in 
+        <foreach item="itemId" collection="array" open="(" separator="," close=")">
+            #{itemId}
+        </foreach>
+    </delete>
+</mapper>

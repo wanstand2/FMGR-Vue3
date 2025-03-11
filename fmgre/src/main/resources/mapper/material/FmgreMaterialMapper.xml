@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.fmgr.mapper.FmgreMaterialMapper">
+    
+    <resultMap type="FmgreMaterial" id="FmgreMaterialResult">
+        <result property="materailId"    column="materail_id"    />
+        <result property="materailTypeDictid"    column="materail_type_dictid"    />
+        <result property="materailCode"    column="materail_code"    />
+        <result property="materailName"    column="materail_name"    />
+        <result property="unitDictid"    column="unit_dictid"    />
+        <result property="valuationAmount"    column="valuation_amount"    />
+        <result property="priceSale"    column="price_sale"    />
+        <result property="storageDictid"    column="storage_dictid"    />
+        <result property="comment"    column="comment"    />
+    </resultMap>
+
+    <sql id="selectFmgreMaterialVo">
+        select materail_id, materail_type_dictid, materail_code, materail_name, unit_dictid, valuation_amount, price_sale, storage_dictid, comment from fmgre_material
+    </sql>
+
+    <select id="selectFmgreMaterialList" parameterType="FmgreMaterial" resultMap="FmgreMaterialResult">
+        <include refid="selectFmgreMaterialVo"/>
+        <where>  
+            <if test="materailTypeDictid != null  and materailTypeDictid != ''"> and materail_type_dictid = #{materailTypeDictid}</if>
+            <if test="materailCode != null  and materailCode != ''"> and materail_code like concat('%', #{materailCode}, '%')</if>
+            <if test="materailName != null  and materailName != ''"> and materail_name like concat('%', #{materailName}, '%')</if>
+            <if test="unitDictid != null  and unitDictid != ''"> and unit_dictid = #{unitDictid}</if>
+            <if test="valuationAmount != null "> and valuation_amount = #{valuationAmount}</if>
+            <if test="params.beginPriceSale != null and params.beginPriceSale != '' and params.endPriceSale != null and params.endPriceSale != ''"> and price_sale between #{params.beginPriceSale} and #{params.endPriceSale}</if>
+            <if test="storageDictid != null  and storageDictid != ''"> and storage_dictid = #{storageDictid}</if>
+            <if test="comment != null  and comment != ''"> and comment like concat('%', #{comment}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectFmgreMaterialByMaterailId" parameterType="Long" resultMap="FmgreMaterialResult">
+        <include refid="selectFmgreMaterialVo"/>
+        where materail_id = #{materailId}
+    </select>
+
+    <select id="selectFmgreMaterialByMaterailIds" parameterType="java.util.Collection" resultMap="FmgreMaterialResult">
+        <include refid="selectFmgreMaterialVo"/>
+        where materail_id in
+        <foreach item="materailId" collection="list" open="(" separator="," close=")">
+            #{materailId}
+        </foreach>
+    </select>
+    
+    <insert id="insertFmgreMaterial" parameterType="FmgreMaterial" useGeneratedKeys="true" keyProperty="materailId">
+        insert into fmgre_material
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="materailTypeDictid != null">materail_type_dictid,</if>
+            <if test="materailCode != null">materail_code,</if>
+            <if test="materailName != null">materail_name,</if>
+            <if test="unitDictid != null">unit_dictid,</if>
+            <if test="valuationAmount != null">valuation_amount,</if>
+            <if test="priceSale != null">price_sale,</if>
+            <if test="storageDictid != null">storage_dictid,</if>
+            <if test="comment != null">comment,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="materailTypeDictid != null">#{materailTypeDictid},</if>
+            <if test="materailCode != null">#{materailCode},</if>
+            <if test="materailName != null">#{materailName},</if>
+            <if test="unitDictid != null">#{unitDictid},</if>
+            <if test="valuationAmount != null">#{valuationAmount},</if>
+            <if test="priceSale != null">#{priceSale},</if>
+            <if test="storageDictid != null">#{storageDictid},</if>
+            <if test="comment != null">#{comment},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFmgreMaterial" parameterType="FmgreMaterial">
+        update fmgre_material
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="materailTypeDictid != null">materail_type_dictid = #{materailTypeDictid},</if>
+            <if test="materailCode != null">materail_code = #{materailCode},</if>
+            <if test="materailName != null">materail_name = #{materailName},</if>
+            <if test="unitDictid != null">unit_dictid = #{unitDictid},</if>
+            <if test="valuationAmount != null">valuation_amount = #{valuationAmount},</if>
+            <if test="priceSale != null">price_sale = #{priceSale},</if>
+            <if test="storageDictid != null">storage_dictid = #{storageDictid},</if>
+            <if test="comment != null">comment = #{comment},</if>
+        </trim>
+        where materail_id = #{materailId}
+    </update>
+
+    <delete id="deleteFmgreMaterialByMaterailId" parameterType="Long">
+        delete from fmgre_material where materail_id = #{materailId}
+    </delete>
+
+    <delete id="deleteFmgreMaterialByMaterailIds" parameterType="String">
+        delete from fmgre_material where materail_id in 
+        <foreach item="materailId" collection="array" open="(" separator="," close=")">
+            #{materailId}
+        </foreach>
+    </delete>
+</mapper>

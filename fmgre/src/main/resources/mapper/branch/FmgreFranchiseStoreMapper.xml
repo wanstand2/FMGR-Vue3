@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.fmgr.mapper.FmgreFranchiseStoreMapper">
+    
+    <resultMap type="FmgreFranchiseStore" id="FmgreFranchiseStoreResult">
+        <result property="deptId"    column="dept_id"    />
+		<result property="parentId"   column="parent_id"   />
+		<result property="ancestors"  column="ancestors"   />
+		<result property="deptName"   column="dept_name"   />
+		<result property="orderNum"   column="order_num"   />
+		<result property="leader"     column="leader"      />
+		<result property="phone"      column="phone"       />
+		<result property="email"      column="email"       />
+		<result property="status"     column="status"      />
+		<result property="delFlag"    column="del_flag"    />
+		<result property="parentName" column="parent_name" />
+		<result property="createBy"   column="create_by"   />
+		<result property="createTime" column="create_time" />
+		<result property="updateBy"   column="update_by"   />
+		<result property="updateTime" column="update_time" />
+        <result property="storeAddress"    column="store_address"    />
+        <result property="storeDetail"    column="store_detail"    />
+    </resultMap>
+
+    <sql id="selectFmgreFranchiseStoreVo">
+        select d.dept_id, d.parent_id, d.ancestors, d.dept_name, d.order_num, d.leader, d.phone, d.email, d.status, d.del_flag, d.create_by, d.create_time, 
+        s.store_address, s.store_detail
+        from sys_dept as d inner join fmgre_franchise_store as s on d.dept_id = s.dept_id
+    </sql>
+
+    <select id="selectFmgreFranchiseStoreList" parameterType="FmgreFranchiseStore" resultMap="FmgreFranchiseStoreResult">
+        <include refid="selectFmgreFranchiseStoreVo"/>
+        where d.del_flag = '0'
+		<if test="deptId != null and deptId != 0">
+			AND dept_id = #{deptId}
+		</if>
+        <if test="parentId != null and parentId != 0">
+			AND parent_id = #{parentId}
+		</if>
+		<if test="deptName != null and deptName != ''">
+			AND dept_name like concat('%', #{deptName}, '%')
+		</if>
+		<if test="status != null and status != ''">
+			AND status = #{status}
+		</if>
+        <if test="storeAddress != null  and storeAddress != ''"> and s.store_address like concat('%', #{storeAddress}, '%')</if>
+        <if test="storeDetail != null  and storeDetail != ''"> and s.store_detail like concat('%', #{storeDetail}, '%')</if>
+		<!-- 数据范围过滤 -->
+		${params.dataScope}
+    </select>
+    
+    <select id="selectFmgreFranchiseStoreByDeptId" parameterType="Long" resultMap="FmgreFranchiseStoreResult">
+        <include refid="selectFmgreFranchiseStoreVo"/>
+        where s.dept_id = #{deptId}
+    </select>
+
+    <insert id="insertFmgreFranchiseStore" parameterType="FmgreFranchiseStore">
+        insert into fmgre_franchise_store
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deptId != null">dept_id,</if>
+            <if test="storeAddress != null">store_address,</if>
+            <if test="storeDetail != null">store_detail,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deptId != null">#{deptId},</if>
+            <if test="storeAddress != null">#{storeAddress},</if>
+            <if test="storeDetail != null">#{storeDetail},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFmgreFranchiseStore" parameterType="FmgreFranchiseStore">
+        update fmgre_franchise_store
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="storeAddress != null">store_address = #{storeAddress},</if>
+            <if test="storeDetail != null">store_detail = #{storeDetail},</if>
+        </trim>
+        where dept_id = #{deptId}
+    </update>
+
+    <delete id="deleteFmgreFranchiseStoreByDeptId" parameterType="Long">
+        delete from fmgre_franchise_store where dept_id = #{deptId}
+    </delete>
+
+    <delete id="deleteFmgreFranchiseStoreByDeptIds" parameterType="String">
+        delete from fmgre_franchise_store where dept_id in 
+        <foreach item="deptId" collection="array" open="(" separator="," close=")">
+            #{deptId}
+        </foreach>
+    </delete>
+</mapper>

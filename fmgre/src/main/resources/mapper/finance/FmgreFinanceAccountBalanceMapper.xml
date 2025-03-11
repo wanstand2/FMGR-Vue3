@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.fmgr.mapper.FmgreFinanceAccountBalanceMapper">
+    
+    <resultMap type="FmgreFinanceAccountBalance" id="FmgreFinanceAccountBalanceResult">
+        <result property="accountId"    column="account_id"    />
+        <result property="accountBalance"    column="account_balance"    />
+    </resultMap>
+
+    <sql id="selectFmgreFinanceAccountBalanceVo">
+        select account_id, account_balance from fmgre_finance_account_balance
+    </sql>
+
+    <select id="selectFmgreFinanceAccountBalanceList" parameterType="FmgreFinanceAccountBalance" resultMap="FmgreFinanceAccountBalanceResult">
+        <include refid="selectFmgreFinanceAccountBalanceVo"/>
+        <where>  
+            <if test="params.beginAccountBalance != null and params.beginAccountBalance != '' and params.endAccountBalance != null and params.endAccountBalance != ''"> and account_balance between #{params.beginAccountBalance} and #{params.endAccountBalance}</if>
+        </where>
+    </select>
+
+    <select id="selectFmgreFinanceAccountBalanceListByAccountIds" parameterType="java.util.Collection" resultMap="FmgreFinanceAccountBalanceResult">
+        <include refid="selectFmgreFinanceAccountBalanceVo"/>
+        where 0
+		<if test="collection != null and collection.size() > 0">
+            or account_id in
+            <foreach item="accountId" collection="list" open="(" separator="," close=")">
+                #{accountId}
+            </foreach>
+        </if>
+    </select>
+    
+    <select id="selectFmgreFinanceAccountBalanceByAccountId" parameterType="Long" resultMap="FmgreFinanceAccountBalanceResult">
+        <include refid="selectFmgreFinanceAccountBalanceVo"/>
+        where account_id = #{accountId}
+    </select>
+
+    <insert id="insertFmgreFinanceAccountBalance" parameterType="FmgreFinanceAccountBalance">
+        insert into fmgre_finance_account_balance
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="accountId != null">account_id,</if>
+            <if test="accountBalance != null">account_balance,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="accountId != null">#{accountId},</if>
+            <if test="accountBalance != null">#{accountBalance},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFmgreFinanceAccountBalance" parameterType="FmgreFinanceAccountBalance">
+        update fmgre_finance_account_balance
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="accountBalance != null">account_balance = #{accountBalance},</if>
+        </trim>
+        where account_id = #{accountId}
+    </update>
+
+    <delete id="deleteFmgreFinanceAccountBalanceByAccountId" parameterType="Long">
+        delete from fmgre_finance_account_balance where account_id = #{accountId}
+    </delete>
+
+    <delete id="deleteFmgreFinanceAccountBalanceByAccountIds" parameterType="String">
+        delete from fmgre_finance_account_balance where account_id in 
+        <foreach item="accountId" collection="array" open="(" separator="," close=")">
+            #{accountId}
+        </foreach>
+    </delete>
+</mapper>

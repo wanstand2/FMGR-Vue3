@@ -1,5 +1,6 @@
 package com.ruoyi.system.mapper;
 
+import java.util.Collection;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import com.ruoyi.common.core.domain.entity.SysDept;
@@ -35,6 +36,8 @@ public interface SysDeptMapper
      * @return 部门信息
      */
     public SysDept selectDeptById(Long deptId);
+
+	public List<SysDept> selectDeptByIds(Collection<Long> deptIds);
 
     /**
      * 根据ID查询所有子部门

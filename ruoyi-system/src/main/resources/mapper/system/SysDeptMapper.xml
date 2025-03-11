@@ -65,6 +65,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where d.dept_id = #{deptId}
 	</select>
     
+    <select id="selectDeptByIds" parameterType="java.util.Collection" resultMap="SysDeptResult">
+		select d.dept_id, d.parent_id, d.ancestors, d.dept_name, d.order_num, d.leader, d.phone, d.email, d.status,
+			(select dept_name from sys_dept where dept_id = d.parent_id) parent_name
+		from sys_dept d where 0
+		<if test="collection != null and collection.size() > 0">
+			or d.dept_id in 
+			<foreach item="id" collection="list" open="(" separator="," close=",0)">
+				#{id}
+			</foreach>
+		</if>
+	</select>
+    
     <select id="checkDeptExistUser" parameterType="Long" resultType="int">
 		select count(1) from sys_user where dept_id = #{deptId} and del_flag = '0'
 	</select>
@@ -88,6 +100,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
     
     <insert id="insertDept" parameterType="SysDept">
+	    <selectKey keyProperty="deptId" order="AFTER" resultType="java.lang.Long">
+          SELECT LAST_INSERT_ID()
+        </selectKey>
  		insert into sys_dept(
  			<if test="deptId != null and deptId != 0">dept_id,</if>
  			<if test="parentId != null and parentId != 0">parent_id,</if>

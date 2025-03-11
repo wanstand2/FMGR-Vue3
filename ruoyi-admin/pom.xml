@@ -61,6 +61,12 @@
             <artifactId>ruoyi-generator</artifactId>
         </dependency>
 
+        <!-- fmgre-->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>fmgre</artifactId>
+        </dependency>
+        
     </dependencies>
 
     <build>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.fmgr.mapper.FmgreFinanceBankMapper">
+    
+    <resultMap type="FmgreFinanceBank" id="FmgreFinanceBankResult">
+        <result property="bankId"    column="back_id"    />
+        <result property="bankName"    column="bank_name"    />
+        <result property="bankDesc"    column="bank_desc"    />
+        <result property="swiftCode"    column="swift_code"    />
+    </resultMap>
+
+    <sql id="selectFmgreFinanceBankVo">
+        select back_id, bank_name, bank_desc, swift_code from fmgre_finance_bank
+    </sql>
+
+    <select id="selectFmgreFinanceBankList" parameterType="FmgreFinanceBank" resultMap="FmgreFinanceBankResult">
+        <include refid="selectFmgreFinanceBankVo"/>
+        <where>  
+            <if test="bankName != null  and bankName != ''"> and bank_name like concat('%', #{bankName}, '%')</if>
+            <if test="bankDesc != null  and bankDesc != ''"> and bank_desc like concat('%', #{bankDesc}, '%')</if>
+            <if test="swiftCode != null  and swiftCode != ''"> and swift_code = #{swiftCode}</if>
+        </where>
+    </select>
+    
+    <select id="selectFmgreFinanceBankListByIds" parameterType="java.util.Collection" resultMap="FmgreFinanceBankResult">
+        <include refid="selectFmgreFinanceBankVo"/>
+        where 0
+        <if test="collection != null and collection.size() > 0">
+            or back_id in
+            <foreach item="bankId" collection="list" open="(" separator="," close=")">
+                #{bankId}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="selectFmgreFinanceBankBybankId" parameterType="Long" resultMap="FmgreFinanceBankResult">
+        <include refid="selectFmgreFinanceBankVo"/>
+        where back_id = #{bankId}
+    </select>
+
+    <insert id="insertFmgreFinanceBank" parameterType="FmgreFinanceBank" useGeneratedKeys="true" keyProperty="bankId">
+        insert into fmgre_finance_bank
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bankName != null">bank_name,</if>
+            <if test="bankDesc != null">bank_desc,</if>
+            <if test="swiftCode != null">swift_code,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bankName != null">#{bankName},</if>
+            <if test="bankDesc != null">#{bankDesc},</if>
+            <if test="swiftCode != null">#{swiftCode},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFmgreFinanceBank" parameterType="FmgreFinanceBank">
+        update fmgre_finance_bank
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bankName != null">bank_name = #{bankName},</if>
+            <if test="bankDesc != null">bank_desc = #{bankDesc},</if>
+            <if test="swiftCode != null">swift_code = #{swiftCode},</if>
+        </trim>
+        where back_id = #{bankId}
+    </update>
+
+    <delete id="deleteFmgreFinanceBankBybankId" parameterType="Long">
+        delete from fmgre_finance_bank where back_id = #{bankId}
+    </delete>
+
+    <delete id="deleteFmgreFinanceBankBybankIds" parameterType="String">
+        delete from fmgre_finance_bank where back_id in 
+        <foreach item="bankId" collection="array" open="(" separator="," close=")">
+            #{bankId}
+        </foreach>
+    </delete>
+</mapper>

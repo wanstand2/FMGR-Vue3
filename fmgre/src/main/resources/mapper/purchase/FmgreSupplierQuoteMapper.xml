@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.fmgr.mapper.FmgreSupplierQuoteMapper">
+    
+    <resultMap type="FmgreSupplierQuote" id="FmgreSupplierQuoteResult">
+        <result property="quoteId"    column="quote_id"    />
+        <result property="materailId"    column="materail_id"    />
+        <result property="supplierId"    column="supplier_id"    />
+        <result property="supplierBrandId"    column="supplier_brand_id"    />
+        <result property="packUnitDictid"    column="pack_unit_dictid"    />
+        <result property="packNum"    column="pack_num"    />
+        <result property="packSize"    column="pack_size"    />
+        <result property="subPackUnitDictid"    column="sub_pack_unit_dictid"    />
+        <result property="subPackNum"    column="sub_pack_num"    />
+        <result property="subPackSize"    column="sub_pack_size"    />
+        <result property="quotaTime"    column="quota_time"    />
+        <result property="quotaPrice"    column="quota_price"    />
+        <result property="quotaComment"    column="quota_comment"    />
+    </resultMap>
+
+    <sql id="selectFmgreSupplierQuoteVo">
+        select quote_id, materail_id, supplier_id, supplier_brand_id, pack_unit_dictid, pack_num, pack_size, sub_pack_unit_dictid, sub_pack_num, sub_pack_size, quota_time, quota_price, quota_comment from fmgre_supplier_quote
+    </sql>
+
+    <select id="selectFmgreSupplierQuoteListByMaterailIdPackUnitDictidLatest" parameterType="Long" resultMap="FmgreSupplierQuoteResult">
+        select quote_id, q.materail_id, supplier_id, supplier_brand_id, q.pack_unit_dictid, pack_num, pack_size, sub_pack_unit_dictid, sub_pack_num, sub_pack_size, quota_time, quota_price, quota_comment from fmgre_supplier_quote
+        AS q INNER JOIN (
+            SELECT MAX(`quota_time`) as `max_quota_time`,`materail_id`,`pack_unit_dictid`
+            FROM `fmgre_supplier_quote` GROUP BY `materail_id`,`pack_unit_dictid`
+            ) AS qg ON q.quota_time = qg.max_quota_time AND q.materail_id = qg.materail_id AND q.pack_unit_dictid = qg.pack_unit_dictid
+        WHERE q.supplier_id = #{supplierId}
+    </select>
+
+    <select id="selectFmgreSupplierQuoteList" parameterType="FmgreSupplierQuote" resultMap="FmgreSupplierQuoteResult">
+        <include refid="selectFmgreSupplierQuoteVo"/>
+        <where>  
+            <if test="materailId != null "> and materail_id = #{materailId}</if>
+            <if test="supplierId != null "> and supplier_id = #{supplierId}</if>
+            <if test="supplierBrandId != null "> and supplier_brand_id = #{supplierBrandId}</if>
+            <if test="params.beginQuotaTime != null and params.beginQuotaTime != '' and params.endQuotaTime != null and params.endQuotaTime != ''"> and quota_time between #{params.beginQuotaTime} and #{params.endQuotaTime}</if>
+            <if test="params.beginQuotaPrice != null and params.beginQuotaPrice != '' and params.endQuotaPrice != null and params.endQuotaPrice != ''"> and quota_price between #{params.beginQuotaPrice} and #{params.endQuotaPrice}</if>
+            <if test="quotaComment != null  and quotaComment != ''"> and quota_comment like concat('%', #{quotaComment}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectFmgreSupplierQuoteByQuoteId" parameterType="Long" resultMap="FmgreSupplierQuoteResult">
+        <include refid="selectFmgreSupplierQuoteVo"/>
+        where quote_id = #{quoteId}
+    </select>
+
+    <insert id="insertFmgreSupplierQuote" parameterType="FmgreSupplierQuote" useGeneratedKeys="true" keyProperty="quoteId">
+        insert into fmgre_supplier_quote
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="materailId != null">materail_id,</if>
+            <if test="supplierId != null">supplier_id,</if>
+            <if test="supplierBrandId != null">supplier_brand_id,</if>
+            <if test="packUnitDictid != null">pack_unit_dictid,</if>
+            <if test="packNum != null">pack_num,</if>
+            <if test="packSize != null">pack_size,</if>
+            <if test="subPackUnitDictid != null">sub_pack_unit_dictid,</if>
+            <if test="subPackNum != null">sub_pack_num,</if>
+            <if test="subPackSize != null">sub_pack_size,</if>
+            <if test="quotaTime != null">quota_time,</if>
+            <if test="quotaPrice != null">quota_price,</if>
+            <if test="quotaComment != null">quota_comment,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="materailId != null">#{materailId},</if>
+            <if test="supplierId != null">#{supplierId},</if>
+            <if test="supplierBrandId != null">#{supplierBrandId},</if>
+            <if test="packUnitDictid != null">#{packUnitDictid},</if>
+            <if test="packNum != null">#{packNum},</if>
+            <if test="packSize != null">#{packSize},</if>
+            <if test="subPackUnitDictid != null">#{subPackUnitDictid},</if>
+            <if test="subPackNum != null">#{subPackNum},</if>
+            <if test="subPackSize != null">#{subPackSize},</if>
+            <if test="quotaTime != null">#{quotaTime},</if>
+            <if test="quotaPrice != null">#{quotaPrice},</if>
+            <if test="quotaComment != null">#{quotaComment},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFmgreSupplierQuote" parameterType="FmgreSupplierQuote">
+        update fmgre_supplier_quote
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="materailId != null">materail_id = #{materailId},</if>
+            <if test="supplierId != null">supplier_id = #{supplierId},</if>
+            <if test="supplierBrandId != null">supplier_brand_id = #{supplierBrandId},</if>
+            <if test="packUnitDictid != null">pack_unit_dictid = #{packUnitDictid},</if>
+            <if test="packNum != null">pack_num = #{packNum},</if>
+            <if test="packSize != null">pack_size = #{packSize},</if>
+            <if test="subPackUnitDictid != null">sub_pack_unit_dictid = #{subPackUnitDictid},</if>
+            <if test="subPackNum != null">sub_pack_num = #{subPackNum},</if>
+            <if test="subPackSize != null">sub_pack_size = #{subPackSize},</if>
+            <if test="quotaTime != null">quota_time = #{quotaTime},</if>
+            <if test="quotaPrice != null">quota_price = #{quotaPrice},</if>
+            <if test="quotaComment != null">quota_comment = #{quotaComment},</if>
+        </trim>
+        where quote_id = #{quoteId}
+    </update>
+
+    <delete id="deleteFmgreSupplierQuoteByQuoteId" parameterType="Long">
+        delete from fmgre_supplier_quote where quote_id = #{quoteId}
+    </delete>
+
+    <delete id="deleteFmgreSupplierQuoteByQuoteIds" parameterType="String">
+        delete from fmgre_supplier_quote where quote_id in 
+        <foreach item="quoteId" collection="array" open="(" separator="," close=")">
+            #{quoteId}
+        </foreach>
+    </delete>
+</mapper>
