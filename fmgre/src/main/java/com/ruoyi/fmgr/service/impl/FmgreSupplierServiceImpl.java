@@ -1,6 +1,7 @@
 package com.ruoyi.fmgr.service.impl;
 
 import java.util.List;
+import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.fmgr.mapper.FmgreSupplierMapper;
@@ -42,6 +43,10 @@ public class FmgreSupplierServiceImpl implements IFmgreSupplierService
     public List<FmgreSupplier> selectFmgreSupplierList(FmgreSupplier fmgreSupplier)
     {
         return fmgreSupplierMapper.selectFmgreSupplierList(fmgreSupplier);
+    }
+
+    public List<FmgreSupplier> selectFmgreSupplierList(Collection<Long> supplierIds, FmgreSupplier fmgreSupplier) {
+        return fmgreSupplierMapper.selectFmgreSupplierListSupplierIds(supplierIds, fmgreSupplier);
     }
 
     /**

@@ -58,11 +58,18 @@ public class FmgreFinancePaymentServiceImpl implements IFmgreFinancePaymentServi
     @Override
     public int insertFmgreFinancePayment(FmgreFinancePayment fmgreFinancePayment)
     {
-        int ret = fmgreFinancePaymentMapper.insertFmgreFinancePayment(fmgreFinancePayment);
         Long accountId = fmgreFinancePayment.getInAccId();
-        if (accountId == null || accountId == 0) {
-            accountId = fmgreFinancePayment.getOutAccId();
+        if (accountId != null && accountId != 0) {
+            updateAccountBalance(accountId, fmgreFinancePayment.getPaymentAmount());
         }
+        accountId = fmgreFinancePayment.getOutAccId();
+        if (accountId != null && accountId != 0) {
+            updateAccountBalance(accountId, BigDecimal.ZERO.subtract(fmgreFinancePayment.getPaymentAmount()));
+        }
+        return fmgreFinancePaymentMapper.insertFmgreFinancePayment(fmgreFinancePayment);
+    }
+
+    private void updateAccountBalance(Long accountId, BigDecimal paymentAmount) {
         BigDecimal outAmount = fmgreFinancePaymentMapper.getPaymentAmountOutSum(accountId);
         BigDecimal inAmount = fmgreFinancePaymentMapper.getPaymentAmountInSum(accountId);
         if(outAmount == null) {
@@ -73,9 +80,8 @@ public class FmgreFinancePaymentServiceImpl implements IFmgreFinancePaymentServi
         }
         FmgreFinanceAccountBalance balance = new FmgreFinanceAccountBalance();
         balance.setAccountId(accountId);
-        balance.setAccountBalance(inAmount.subtract(outAmount));
+        balance.setAccountBalance(inAmount.subtract(outAmount).add(paymentAmount));
         fmgreFinanceAccountBalanceMapper.updateFmgreFinanceAccountBalance(balance);
-        return ret;
     }
 
     /**

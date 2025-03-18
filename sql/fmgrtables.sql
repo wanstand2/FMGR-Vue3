@@ -136,5 +136,6 @@ create table fmgre_finance_payment (
   order_id          bigint(20)      default 0                  comment '订单id(若有)',
   payment_comment   varchar(80)     default ''                 comment '支付说明',
   payment_amount    decimal(18,2)   default 0                  comment '支付金额',
+  payment_time      datetime                                   comment '支付时间',
   primary key (payment_id)
 ) engine=innodb auto_increment=100 comment = '付款流水表';

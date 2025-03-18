@@ -29,6 +29,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="contactPhone != null  and contactPhone != ''"> and contact_phone = #{contactPhone}</if>
         </where>
     </select>
+
+    <select id="selectFmgreSupplierListSupplierIds" parameterType="map" resultMap="FmgreSupplierResult">
+        <include refid="selectFmgreSupplierVo"/>
+        <where>  
+            <if test="supplier.supplierName != null  and supplier.supplierName != ''"> and supplier_name like concat('%', #{supplier.supplierName}, '%')</if>
+            <if test="supplier.supplierCode != null  and supplier.supplierCode != ''"> and supplier_code = #{supplier.supplierCode}</if>
+            <if test="supplier.supplierDetail != null  and supplier.supplierDetail != ''"> and supplier_detail = #{supplier.supplierDetail}</if>
+            <if test="supplier.address != null  and supplier.address != ''"> and address = #{supplier.address}</if>
+            <if test="supplier.contactName != null  and supplier.contactName != ''"> and contact_name like concat('%', #{supplier.contactName}, '%')</if>
+            <if test="supplier.contactPhone != null  and supplier.contactPhone != ''"> and contact_phone = #{supplier.contactPhone}</if>
+            <if test="supplierIds != null and supplierIds.size()>0">
+                and supplier_id in
+                <foreach item="supplierId" collection="supplierIds" open="(" separator="," close=")">
+                    #{supplierId}
+                </foreach>
+            </if>
+            <if test="supplierIds == null or supplierIds.size() == 0">
+                and supplier_id in (0)
+            </if>
+        </where>
+    </select>
     
     <select id="selectFmgreSupplierBySupplierId" parameterType="Long" resultMap="FmgreSupplierResult">
         <include refid="selectFmgreSupplierVo"/>
@@ -37,10 +58,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectFmgreSupplierListBySupplierIds" parameterType="Long[]" resultMap="FmgreSupplierResult">
         <include refid="selectFmgreSupplierVo"/>
-        where supplier_id in
-        <foreach item="supplierId" collection="array" open="(" separator="," close=")">
-            #{supplierId}
-        </foreach>
+            where supplier_id in
+            <if test="array == null or array.length == 0">
+                (0)
+            </if>
+            <if test="array != null and array.length > 0">
+                <foreach item="supplierId" collection="array" open="(" separator="," close=")">
+                    #{supplierId}
+                </foreach>
+            </if>
     </select>
 
     <insert id="insertFmgreSupplier" parameterType="FmgreSupplier" useGeneratedKeys="true" keyProperty="supplierId">

@@ -12,10 +12,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="orderId"    column="order_id"    />
         <result property="paymentComment"    column="payment_comment"    />
         <result property="paymentAmount"    column="payment_amount"    />
+        <result property="paymentTime"    column="payment_time"    />
+        <result property="outAccBanlance"    column="out_acc_banlance"    />
+        <result property="inAccBanlance"    column="in_acc_banlance"    />
     </resultMap>
 
     <sql id="selectFmgreFinancePaymentVo">
-        select payment_id, out_acc_id, in_acc_id, user_id, order_id, payment_comment, payment_amount from fmgre_finance_payment
+        select payment_id, out_acc_id, in_acc_id, user_id, order_id, payment_comment, payment_amount, payment_time, out_acc_banlance, in_acc_banlance from fmgre_finance_payment
     </sql>
 
     <select id="selectFmgreFinancePaymentList" parameterType="FmgreFinancePayment" resultMap="FmgreFinancePaymentResult">
@@ -23,9 +26,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>  
             <if test="outAccId != null "> and out_acc_id = #{outAccId}</if>
             <if test="inAccId != null "> and in_acc_id = #{inAccId}</if>
+            <if test="accountId != null "> and (out_acc_id = #{accountId} or in_acc_id = #{accountId})</if>
             <if test="userId != null "> and user_id = #{userId}</if>
             <if test="orderId != null "> and order_id = #{orderId}</if>
-            <if test="paymentComment != null  and paymentComment != ''"> and payment_comment = #{paymentComment}</if>
+            <if test="paymentTime != null "> and payment_time = #{paymentTime}</if>
+            <if test="paymentComment != null  and paymentComment != ''"> and payment_comment like concat('%', #{paymentComment}, '%')</if>
             <if test="params.beginPaymentAmount != null and params.beginPaymentAmount != '' and params.endPaymentAmount != null and params.endPaymentAmount != ''"> and payment_amount between #{params.beginPaymentAmount} and #{params.endPaymentAmount}</if>
         </where>
     </select>
@@ -44,6 +49,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="orderId != null">order_id,</if>
             <if test="paymentComment != null">payment_comment,</if>
             <if test="paymentAmount != null">payment_amount,</if>
+            <if test="paymentTime != null">payment_time,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="outAccId != null">#{outAccId},</if>
@@ -52,6 +58,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="orderId != null">#{orderId},</if>
             <if test="paymentComment != null">#{paymentComment},</if>
             <if test="paymentAmount != null">#{paymentAmount},</if>
+            <if test="paymentTime != null">#{paymentTime},</if>
          </trim>
     </insert>
 
@@ -64,6 +71,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="orderId != null">order_id = #{orderId},</if>
             <if test="paymentComment != null">payment_comment = #{paymentComment},</if>
             <if test="paymentAmount != null">payment_amount = #{paymentAmount},</if>
+            <if test="paymentTime != null">payment_time = #{paymentTime},</if>
         </trim>
         where payment_id = #{paymentId}
     </update>

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.fmgr.mapper.FmgrePurchaseItemMapper;
 import com.ruoyi.fmgr.domain.FmgrePurchaseItem;
 import com.ruoyi.fmgr.domain.FmgrePurchaseRequirSummaryBo;
+import com.ruoyi.fmgr.domain.FmgrePurchaseOrderSummaryBo;
 import com.ruoyi.fmgr.service.IFmgrePurchaseItemService;
 
 /**
@@ -106,6 +107,12 @@ public class FmgrePurchaseItemServiceImpl implements IFmgrePurchaseItemService
     }
 
     @Override
+    public List<FmgrePurchaseOrderSummaryBo> selectFmgrePurchaseOrderSummaryByOrderIds(Collection<Long> orderIds)
+    {
+        return fmgrePurchaseItemMapper.selectFmgrePurchaseOrderSummaryByOrderIds(orderIds);
+    }
+
+    @Override
     public int updateFmgrePurchaseItems(List<FmgrePurchaseItem> fmgrePurchaseItems) {
         int rows = 0;
         for(FmgrePurchaseItem item : fmgrePurchaseItems) {
@@ -113,4 +120,6 @@ public class FmgrePurchaseItemServiceImpl implements IFmgrePurchaseItemService
         }
         return rows;
     }
+
+    
 }

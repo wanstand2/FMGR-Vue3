@@ -265,4 +265,15 @@ public class RedisCache
     {
         return redisTemplate.keys(pattern);
     }
+
+    /**
+     * 生成自增数字
+     * @param key 生成内容的key
+     * @param delta 增量
+     * @return 生成内容
+     */
+    public Long increment(final String key, final long delta)
+    {
+        return redisTemplate.opsForValue().increment(key, delta);
+    }
 }

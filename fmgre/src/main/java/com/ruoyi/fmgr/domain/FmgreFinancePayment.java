@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
+import java.util.Date;
 
 /**
  * 付款流水对象 fmgre_finance_payment
@@ -42,6 +43,21 @@ public class FmgreFinancePayment extends BaseEntity
     /** 支付金额 */
     @Excel(name = "支付金额")
     private BigDecimal paymentAmount;
+
+    /** 支付时间 */
+    @Excel(name = "支付时间")
+    private Date paymentTime;
+
+    /** 付款账户余额 */
+    @Excel(name = "付款账户余额 (付款后)")
+    private BigDecimal outAccBanlance;
+
+    /** 收款账户余额 */
+    @Excel(name = "收款账户余额 (收款后)")
+    private BigDecimal inAccBanlance;
+
+    /** 查询时使用的账户id */
+    private Long accountId;
 
     public void setPaymentId(Long paymentId) 
     {
@@ -106,7 +122,43 @@ public class FmgreFinancePayment extends BaseEntity
     {
         return paymentAmount;
     }
+    public void setPaymentTime(Date paymentTime) 
+    {
+        this.paymentTime = paymentTime;
+    }
 
+    public Date getPaymentTime() 
+    {
+        return paymentTime;
+    }
+    public void setOutAccBanlance(BigDecimal outAccBanlance) 
+    {
+        this.outAccBanlance = outAccBanlance;
+    }
+
+    public BigDecimal getOutAccBanlance()    
+    {
+        return outAccBanlance;
+    }
+    public void setInAccBanlance(BigDecimal inAccBanlance) 
+    {
+        this.inAccBanlance = inAccBanlance;
+    }   
+
+    public BigDecimal getInAccBanlance() 
+    {
+        return inAccBanlance;
+    }
+    public void setAccountId(Long accountId) 
+    {
+        this.accountId = accountId;
+    }
+
+    public Long getAccountId() 
+    {
+        return accountId;
+    }
+    
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -117,6 +169,9 @@ public class FmgreFinancePayment extends BaseEntity
             .append("orderId", getOrderId())
             .append("paymentComment", getPaymentComment())
             .append("paymentAmount", getPaymentAmount())
+            .append("paymentTime", getPaymentTime())
+            .append("outAccBanlance", getOutAccBanlance())
+            .append("inAccBanlance", getInAccBanlance())
             .toString();
     }
 }

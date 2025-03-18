@@ -54,6 +54,16 @@ public class FmgrePurchaseOrder extends BaseEntity
     @Excel(name = "付款id(0未支付)")
     private Long paymentId;
 
+    private FmgrePurchaseOrderSummaryBo summary;
+
+    public FmgrePurchaseOrderSummaryBo getSummary() {
+        return summary;
+    }
+
+    public void setSummary(FmgrePurchaseOrderSummaryBo summary) {
+        this.summary = summary;
+    }
+
     public void setOrderId(Long orderId) 
     {
         this.orderId = orderId;

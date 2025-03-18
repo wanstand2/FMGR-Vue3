@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.fmgr.mapper.FmgreMaterialMapper;
 import com.ruoyi.fmgr.domain.FmgreMaterial;
 import com.ruoyi.fmgr.service.IFmgreMaterialService;
-
+import java.util.ArrayList;
 /**
  * 原材料Service业务层处理
  * 
@@ -35,6 +35,9 @@ public class FmgreMaterialServiceImpl implements IFmgreMaterialService
     @Override
     public List<FmgreMaterial> selectFmgreMaterialByMaterailIds(Collection<Long> materailIds)
     {
+        if (materailIds == null || materailIds.isEmpty()) {
+            return new ArrayList<>();
+        }
         return fmgreMaterialMapper.selectFmgreMaterialByMaterailIds(materailIds);
     }
 

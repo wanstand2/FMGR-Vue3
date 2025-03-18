@@ -63,6 +63,8 @@ public class FmgrePurchaseItem extends BaseEntity
     private BigDecimal itemTotalPrice;
 
     private FmgreMaterial materail = new FmgreMaterial();
+    
+    private FmgreSupplierQuote quote = new FmgreSupplierQuote();
 
     public void setItemId(Long itemId) 
     {
@@ -186,7 +188,15 @@ public class FmgrePurchaseItem extends BaseEntity
         return orderUnitDictid;
     }
 
-    @Override
+    public FmgreSupplierQuote getQuote() {
+		return quote;
+	}
+
+	public void setQuote(FmgreSupplierQuote quote) {
+		this.quote = quote;
+	}
+
+	@Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("itemId", getItemId())
@@ -202,6 +212,7 @@ public class FmgrePurchaseItem extends BaseEntity
             .append("supplierId", getSupplierId())
             .append("itemTotalPrice", getItemTotalPrice())
             .append("materail", getMaterail())
+            .append("quote", getQuote())
             .toString();
     }
 }

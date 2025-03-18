@@ -1,6 +1,8 @@
 package com.ruoyi.fmgr.mapper;
 
 import java.util.List;
+import java.util.Collection;
+import org.apache.ibatis.annotations.Param;
 import com.ruoyi.fmgr.domain.FmgreSupplier;
 
 /**
@@ -26,6 +28,8 @@ public interface FmgreSupplierMapper
      * @return 供应商集合
      */
     public List<FmgreSupplier> selectFmgreSupplierList(FmgreSupplier fmgreSupplier);
+    
+    public List<FmgreSupplier> selectFmgreSupplierListSupplierIds(@Param("supplierIds") Collection<Long> supplierIds, @Param("supplier") FmgreSupplier fmgreSupplier);
 
     /**
      * 新增供应商

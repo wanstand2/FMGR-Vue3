@@ -34,9 +34,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectFmgrePurchaseRequirListByRequirIds" parameterType="Long[]" resultMap="FmgrePurchaseRequirResult">
         <include refid="selectFmgrePurchaseRequir"/>
         where requir_id in
-        <foreach item="requirId" collection="array" open="(" separator="," close=")">
-            #{requirId}
-        </foreach>
+        <if test="array == null or array.length == 0">
+            (0)
+        </if>
+        <if test="array != null and array.length > 0">
+            <foreach item="requirId" collection="array" open="(" separator="," close=")">
+                #{requirId}
+            </foreach>
+        </if>
     </select>
 
     <insert id="insertFmgrePurchaseRequir" parameterType="FmgrePurchaseRequir" useGeneratedKeys="true" keyProperty="requirId">

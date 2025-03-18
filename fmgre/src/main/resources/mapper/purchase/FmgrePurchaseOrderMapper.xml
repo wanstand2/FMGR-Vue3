@@ -15,6 +15,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="orderComment"    column="order_comment"    />
         <result property="paymentId"    column="payment_id"    />
     </resultMap>
+    
+    <resultMap type="FmgreSupplierFinanceBo" id="FmgreSupplierFinanceBoResult">
+        <result property="supplierId"    column="supplier_id"    />
+        <result property="orderTime"    column="min_order_time"    />
+        <result property="debtAmount"    column="debt_amount"    />
+        <result property="debtNum"    column="debt_Num"    />
+    </resultMap>
 
     <sql id="selectFmgrePurchaseOrderVo">
         select order_id, user_id, supplier_id, order_code, delivery_dictid, order_time, order_total_price, order_comment, payment_id from fmgre_purchase_order
@@ -25,13 +32,52 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>  
             <if test="userId != null "> and user_id = #{userId}</if>
             <if test="supplierId != null "> and supplier_id = #{supplierId}</if>
-            <if test="orderCode != null  and orderCode != ''"> and materail_code = #{orderCode}</if>
+            <if test="paymentId != null "> and payment_id = #{paymentId}</if>
+            <if test="orderCode != null  and orderCode != ''"> and order_code like concat('%', #{orderCode}, '%')</if>
             <if test="deliveryDictid != null  and deliveryDictid != ''"> and delivery_dictid = #{deliveryDictid}</if>
             <if test="params.beginOrderTime != null and params.beginOrderTime != '' and params.endOrderTime != null and params.endOrderTime != ''"> and order_time between #{params.beginOrderTime} and #{params.endOrderTime}</if>
             <if test="orderComment != null  and orderComment != ''"> and order_comment like concat('%', #{orderComment}, '%')</if>
         </where>
     </select>
+
+    <select id="selectFmgrePurchaseOrderSupplierFinanceList" parameterType="map" resultMap="FmgreSupplierFinanceBoResult">
+        SELECT `supplier_id`, SUM(`order_total_price`) AS debt_amount, COUNT(*) AS debt_num, MIN(order_time) AS min_order_time FROM `fmgre_purchase_order` 
+        <where>
+            <if test="order.paymentId != 0"> and payment_id > 0 </if>
+            <if test="order.paymentId == 0"> and payment_id = 0 </if>
+            <if test="order.params.beginOrderTime != null and order.params.beginOrderTime != '' and order.params.endOrderTime != null and order.params.endOrderTime != ''"> and order_time between #{order.params.beginOrderTime} and #{order.params.endOrderTime}</if>
+            <if test="supplierIds != null">
+            and supplier_id in 
+            <foreach item="supplierId" collection="supplierIds" open="(" separator="," close=")">
+                #{supplierId}
+            </foreach>
+            </if>
+        </where>
+        GROUP BY 
+        <trim suffixOverrides=",">
+        `supplier_id`, 
+            <if test="order.params.groupBy != null and order.params.groupBy == 'week'">WEEK(`order_time`),</if>
+            <if test="order.params.groupBy != null and order.params.groupBy == 'month'">YEAR(`order_time`), MONTH(`order_time`),</if>
+            <if test="order.params.groupBy != null and order.params.groupBy == 'year'">YEAR(`order_time`)</if>
+            <if test="order.params.groupBy != null and order.params.groupBy == 'day'">YEAR(`order_time`), MONTH(`order_time`), DAY(`order_time`),</if>
+        </trim>
+        <if test="order.params.nonull != null and order.params.nonull == 'true'"> HAVING COUNT(*) > 0</if>
+    </select>
     
+    <select id="getOrdersTotalPrice" parameterType="java.util.Collection" resultType="BigDecimal">
+        select sum(order_total_price) from fmgre_purchase_order where order_id in
+        <foreach item="orderId" collection="orderIds" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </select>
+
+    <update id="updateFmgrePurchaseOrderPaymentId" parameterType="map">
+        update fmgre_purchase_order set payment_id = #{paymentId} where order_id in
+        <foreach item="orderId" collection="orderIds" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </update>
+
     <select id="selectFmgrePurchaseOrderByOrderId" parameterType="Long" resultMap="FmgrePurchaseOrderResult">
         <include refid="selectFmgrePurchaseOrderVo"/>
         where order_id = #{orderId}
@@ -86,4 +132,5 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{orderId}
         </foreach>
     </delete>
+
 </mapper>

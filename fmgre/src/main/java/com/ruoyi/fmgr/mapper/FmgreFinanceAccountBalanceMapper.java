@@ -67,4 +67,6 @@ public interface FmgreFinanceAccountBalanceMapper
      * @return 余额列表
      */
     public List<FmgreFinanceAccountBalance> selectFmgreFinanceAccountBalanceListByAccountIds(Collection<Long> accountIds);
+
+    public int updateFmgreFinanceAccountBalanceByAccountId(Long accountId);
 }

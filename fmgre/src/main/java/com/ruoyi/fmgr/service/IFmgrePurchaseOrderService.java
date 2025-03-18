@@ -1,7 +1,10 @@
 package com.ruoyi.fmgr.service;
 
 import java.util.List;
+import java.math.BigDecimal;
+import java.util.Collection;
 import com.ruoyi.fmgr.domain.FmgrePurchaseOrder;
+import com.ruoyi.fmgr.domain.FmgreSupplierFinanceBo;
 
 /**
  * 采购订单Service接口
@@ -58,4 +61,16 @@ public interface IFmgrePurchaseOrderService
      * @return 结果
      */
     public int deleteFmgrePurchaseOrderByOrderId(Long orderId);
+
+	/**
+	 * 查询供应商付款情况列表
+	 * 
+	 * @param fmgrePurchaseOrder 采购订单
+	 * @return 采购订单
+	 */
+	List<FmgreSupplierFinanceBo> selectFmgrePurchaseOrderSupplierFinanceList(Collection<Long> supplierIds, FmgrePurchaseOrder fmgrePurchaseOrder);
+
+    public BigDecimal getOrdersTotalPrice(List<Long> orderIds);
+
+    public void updateFmgrePurchaseOrderPaymentId(List<Long> orderIds, Long paymentId);
 }

@@ -56,6 +56,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where account_id = #{accountId}
     </update>
 
+    <update id="updateFmgreFinanceAccountBalanceByAccountId" parameterType="Long">
+        update fmgre_finance_account_balance
+        set account_balance = 
+        (COALESCE((select sum(payment_amount) from fmgre_finance_payment where in_acc_id = #{accountId}), 0)) -
+        (COALESCE((select sum(payment_amount) from fmgre_finance_payment where out_acc_id = #{accountId}), 0))
+        where account_id = #{accountId}
+    </update>
+
     <delete id="deleteFmgreFinanceAccountBalanceByAccountId" parameterType="Long">
         delete from fmgre_finance_account_balance where account_id = #{accountId}
     </delete>

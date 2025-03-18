@@ -1,7 +1,11 @@
 package com.ruoyi.fmgr.mapper;
 
+import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
+import org.apache.ibatis.annotations.Param;
 import com.ruoyi.fmgr.domain.FmgrePurchaseOrder;
+import com.ruoyi.fmgr.domain.FmgreSupplierFinanceBo;
 
 /**
  * 采购订单Mapper接口
@@ -58,4 +62,19 @@ public interface FmgrePurchaseOrderMapper
      * @return 结果
      */
     public int deleteFmgrePurchaseOrderByOrderIds(Long[] orderIds);
+
+
+    /**
+     * 查询供应商付款情况列表
+     * 
+     * @param fmgrePurchaseOrder 采购订单
+     * @return 采购订单
+     */
+    public List<FmgreSupplierFinanceBo> selectFmgrePurchaseOrderSupplierFinanceList(
+        @Param("supplierIds") Collection<Long> supplierIds, 
+        @Param("order") FmgrePurchaseOrder fmgrePurchaseOrder);
+
+    public BigDecimal getOrdersTotalPrice(@Param("orderIds") Collection<Long> orderIds);
+
+    public void updateFmgrePurchaseOrderPaymentId(@Param("orderIds") Collection<Long> orderIds, @Param("paymentId") Long paymentId);
 }

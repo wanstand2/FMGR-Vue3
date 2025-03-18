@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-public class FmgrePurchaseItemBo extends FmgrePurchaseItem  {
+public class FmgrePurchaseItemSubmitBo extends FmgrePurchaseItem  {
 
     private String quoteUnitDictid;
 

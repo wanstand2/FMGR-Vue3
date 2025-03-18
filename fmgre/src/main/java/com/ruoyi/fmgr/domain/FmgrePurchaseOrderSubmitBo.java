@@ -6,15 +6,15 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class FmgrePurchaseOrderSubmitBo extends FmgrePurchaseOrder {
 
-    private List<FmgrePurchaseItemBo> items;
+    private List<FmgrePurchaseItemSubmitBo> items;
 
     private Long accountId;
 
-    public List<FmgrePurchaseItemBo> getItems() {
+    public List<FmgrePurchaseItemSubmitBo> getItems() {
         return items;
     }
 
-    public void setItems(List<FmgrePurchaseItemBo> items) {
+    public void setItems(List<FmgrePurchaseItemSubmitBo> items) {
         this.items = items;
     }
 

@@ -1,6 +1,7 @@
 package com.ruoyi.fmgr.service.impl;
 
 import java.util.List;
+import java.math.BigDecimal;
 import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,11 @@ public class FmgreFinanceAccountBalanceServiceImpl implements IFmgreFinanceAccou
     @Override
     public List<FmgreFinanceAccountBalance> selectFmgreFinanceAccountBalanceListByAccountIds(Collection<Long> accountIds) {
         return fmgreFinanceAccountBalanceMapper.selectFmgreFinanceAccountBalanceListByAccountIds(accountIds);
+    }
+
+    @Override
+    public int updateFmgreFinanceAccountBalanceByAccountId(Long accountId) {
+        return fmgreFinanceAccountBalanceMapper.updateFmgreFinanceAccountBalanceByAccountId(accountId);
     }
 
     /**

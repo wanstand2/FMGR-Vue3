@@ -1,6 +1,8 @@
 package com.ruoyi.fmgr.controller;
 
 import java.util.List;
+import java.math.BigDecimal;
+import java.util.Date;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +19,13 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.fmgr.domain.FmgreFinancePayment;
+import com.ruoyi.fmgr.domain.FmgreFinancePaymentPayBo;
 import com.ruoyi.fmgr.service.IFmgreFinancePaymentService;
+import com.ruoyi.fmgr.domain.FmgrePurchaseOrder;
+import com.ruoyi.fmgr.service.IFmgrePurchaseOrderService;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.fmgr.service.IFmgreFinanceAccountBalanceService;
 
 /**
  * 付款流水Controller
@@ -33,6 +39,12 @@ public class FmgreFinancePaymentController extends BaseController
 {
     @Autowired
     private IFmgreFinancePaymentService fmgreFinancePaymentService;
+
+    @Autowired
+    private IFmgrePurchaseOrderService fmgrePurchaseOrderService;
+
+    @Autowired
+    private IFmgreFinanceAccountBalanceService fmgreFinanceAccountBalanceService;
 
     /**
      * 查询付款流水列表
@@ -77,7 +89,46 @@ public class FmgreFinancePaymentController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody FmgreFinancePayment fmgreFinancePayment)
     {
-        return toAjax(fmgreFinancePaymentService.insertFmgreFinancePayment(fmgreFinancePayment));
+        if(fmgreFinancePayment.getPaymentTime() == null) {
+            fmgreFinancePayment.setPaymentTime(new Date());
+        }
+        int ret = fmgreFinancePaymentService.insertFmgreFinancePayment(fmgreFinancePayment);
+        if(ret > 0 && fmgreFinancePayment.getOrderId() != null) {
+            FmgrePurchaseOrder order = new FmgrePurchaseOrder();
+            order.setOrderId(fmgreFinancePayment.getOrderId());
+            order.setPaymentId(fmgreFinancePayment.getPaymentId());
+            fmgrePurchaseOrderService.updateFmgrePurchaseOrder(order);
+        }
+        if(fmgreFinancePayment.getOutAccId() != null) { 
+            fmgreFinanceAccountBalanceService.updateFmgreFinanceAccountBalanceByAccountId(fmgreFinancePayment.getOutAccId());
+        }
+        if(fmgreFinancePayment.getInAccId() != null) {
+            fmgreFinanceAccountBalanceService.updateFmgreFinanceAccountBalanceByAccountId(fmgreFinancePayment.getInAccId());
+        }
+        return toAjax(ret);
+    }
+
+    /**
+     * 向订单付款
+     */
+    @PreAuthorize("@ss.hasPermi('finance:payment:add')")
+    @Log(title = "付款流水", businessType = BusinessType.INSERT)
+    @PostMapping(value = "/pay")
+    public AjaxResult pay(@RequestBody FmgreFinancePaymentPayBo fmgreFinancePaymentPayBo) {
+        if(fmgreFinancePaymentPayBo.getOrderIds() == null || fmgreFinancePaymentPayBo.getOrderIds().size() == 0) {
+            return toAjax(0);
+        }
+        BigDecimal total = fmgrePurchaseOrderService.getOrdersTotalPrice(fmgreFinancePaymentPayBo.getOrderIds());
+        FmgreFinancePayment fmgreFinancePayment = new FmgreFinancePayment();
+        fmgreFinancePayment.setOutAccId(fmgreFinancePaymentPayBo.getAccountId());
+        fmgreFinancePayment.setOrderId(fmgreFinancePaymentPayBo.getOrderIds().get(0));
+        fmgreFinancePayment.setPaymentTime(fmgreFinancePaymentPayBo.getPaymentTime()); 
+        fmgreFinancePayment.setPaymentAmount(total);
+        fmgreFinancePayment.setPaymentComment("财务付款");
+        fmgreFinancePayment.setUserId(getUserId());
+        this.add(fmgreFinancePayment);
+        fmgrePurchaseOrderService.updateFmgrePurchaseOrderPaymentId(fmgreFinancePaymentPayBo.getOrderIds(), fmgreFinancePayment.getPaymentId());
+        return toAjax(fmgreFinancePaymentPayBo.getOrderIds().size());
     }
 
     /**

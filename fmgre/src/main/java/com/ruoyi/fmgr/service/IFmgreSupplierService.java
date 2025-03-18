@@ -1,6 +1,7 @@
 package com.ruoyi.fmgr.service;
 
 import java.util.List;
+import java.util.Collection;
 import com.ruoyi.fmgr.domain.FmgreSupplier;
 
 /**
@@ -26,6 +27,9 @@ public interface IFmgreSupplierService
      * @return 供应商集合
      */
     public List<FmgreSupplier> selectFmgreSupplierList(FmgreSupplier fmgreSupplier);
+
+    public List<FmgreSupplier> selectFmgreSupplierList(Collection<Long> supplierIds, FmgreSupplier fmgreSupplier);
+
 
     /**
      * 新增供应商

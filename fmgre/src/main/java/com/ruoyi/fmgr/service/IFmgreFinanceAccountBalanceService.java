@@ -22,6 +22,8 @@ public interface IFmgreFinanceAccountBalanceService
 
     public List<FmgreFinanceAccountBalance> selectFmgreFinanceAccountBalanceListByAccountIds(Collection<Long> accountIds);
 
+    public int updateFmgreFinanceAccountBalanceByAccountId(Long accountId);
+
     /**
      * 查询银行账户余额列表
      * 

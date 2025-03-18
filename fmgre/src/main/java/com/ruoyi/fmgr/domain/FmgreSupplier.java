@@ -1,5 +1,8 @@
 package com.ruoyi.fmgr.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
@@ -41,6 +44,8 @@ public class FmgreSupplier extends BaseEntity
     /** 联系人电话 */
     @Excel(name = "联系人电话")
     private String contactPhone;
+
+    private  List<FmgreSupplierFinanceBo> financeBos;
 
     public void setSupplierId(Long supplierId) 
     {
@@ -106,7 +111,15 @@ public class FmgreSupplier extends BaseEntity
         return contactPhone;
     }
 
-    @Override
+	public List<FmgreSupplierFinanceBo> getFinanceBos() {
+		return financeBos;
+	}
+
+	public void setFinanceBos(List<FmgreSupplierFinanceBo> financeBos) {
+		this.financeBos = financeBos;
+	}
+
+	@Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("supplierId", getSupplierId())
@@ -116,6 +129,7 @@ public class FmgreSupplier extends BaseEntity
             .append("address", getAddress())
             .append("contactName", getContactName())
             .append("contactPhone", getContactPhone())
+            .append("finance", financeBos == null ? "null" : financeBos.toString())
             .toString();
     }
 }

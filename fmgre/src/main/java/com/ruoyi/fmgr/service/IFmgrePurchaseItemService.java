@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import com.ruoyi.fmgr.domain.FmgrePurchaseItem;
 import com.ruoyi.fmgr.domain.FmgrePurchaseRequirSummaryBo;
+import com.ruoyi.fmgr.domain.FmgrePurchaseOrderSummaryBo;
 
 /**
  * 采购记录Service接口
@@ -23,7 +24,7 @@ public interface IFmgrePurchaseItemService
     public FmgrePurchaseItem selectFmgrePurchaseItemByItemId(Long itemId);
     public List<FmgrePurchaseItem> selectFmgrePurchaseItemByItemIds(Collection<Long> itemIds);
     public List<FmgrePurchaseRequirSummaryBo> selectFmgrePurchaseRequirSummaryByRequirIds(Collection<Long> requirIds);
-
+    public List<FmgrePurchaseOrderSummaryBo> selectFmgrePurchaseOrderSummaryByOrderIds(Collection<Long> orderIds);
     /**
      * 查询采购记录列表
      * 

@@ -25,11 +25,21 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.fmgr.domain.FmgrePurchaseItem;
 import com.ruoyi.fmgr.service.IFmgrePurchaseItemService;
 import com.ruoyi.fmgr.domain.FmgreFinancePayment;
+import com.ruoyi.fmgr.domain.FmgreFinancePaymentDisplayBo;
 import com.ruoyi.fmgr.service.IFmgreFinancePaymentService;
 import com.ruoyi.fmgr.domain.FmgreSupplierQuote;
 import com.ruoyi.fmgr.service.IFmgreSupplierQuoteService;
-import com.ruoyi.fmgr.domain.FmgrePurchaseItemBo;
+import com.ruoyi.fmgr.domain.FmgrePurchaseItemSubmitBo;
+import com.ruoyi.fmgr.domain.FmgrePurchaseOrderDisplayBo;
+import com.ruoyi.fmgr.domain.FmgrePurchaseItemDisplayBo;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.stream.Collectors;
+import com.ruoyi.fmgr.domain.FmgreSupplier;
+import com.ruoyi.fmgr.service.IFmgreSupplierService;
+import com.ruoyi.fmgr.domain.FmgreMaterial;
+import com.ruoyi.fmgr.service.IFmgreMaterialService;
+import com.ruoyi.system.service.ISysUserService;
+import com.ruoyi.fmgr.domain.FmgrePurchaseOrderSummaryBo;
 /**
  * 采购订单Controller
  * 
@@ -52,6 +62,15 @@ public class FmgrePurchaseOrderController extends BaseController
     @Autowired
     private IFmgreSupplierQuoteService fmgreSupplierQuoteService;
 
+    @Autowired
+    private IFmgreSupplierService fmgreSupplierService;
+
+    @Autowired
+    private IFmgreMaterialService fmgreMaterialService;
+
+    @Autowired
+    private ISysUserService sysUserService;
+
     /**
      * 查询采购订单列表
      */
@@ -61,7 +80,14 @@ public class FmgrePurchaseOrderController extends BaseController
     {
         startPage();
         List<FmgrePurchaseOrder> list = fmgrePurchaseOrderService.selectFmgrePurchaseOrderList(fmgrePurchaseOrder);
-        return getDataTable(list);
+        List<Long> orderIds = list.stream().map(FmgrePurchaseOrder::getOrderId).collect(Collectors.toList());
+        if(orderIds.size() > 0) {
+            List<FmgrePurchaseOrderSummaryBo> summaryList = fmgrePurchaseItemService.selectFmgrePurchaseOrderSummaryByOrderIds(orderIds);
+            for(FmgrePurchaseOrder order : list) {
+                order.setSummary(summaryList.stream().filter(s -> s.getOrderId().equals(order.getOrderId())).findFirst().orElse(null));
+            }
+        }
+        return getDataTable(list);      
     }
 
     /**
@@ -84,7 +110,29 @@ public class FmgrePurchaseOrderController extends BaseController
     @GetMapping(value = "/{orderId}")
     public AjaxResult getInfo(@PathVariable("orderId") Long orderId)
     {
-        return success(fmgrePurchaseOrderService.selectFmgrePurchaseOrderByOrderId(orderId));
+        FmgrePurchaseOrderDisplayBo bo = new FmgrePurchaseOrderDisplayBo(fmgrePurchaseOrderService.selectFmgrePurchaseOrderByOrderId(orderId));
+        FmgrePurchaseItem searchItem = new FmgrePurchaseItem();
+        searchItem.setOrderId(orderId);
+        List<FmgrePurchaseItem> items = fmgrePurchaseItemService.selectFmgrePurchaseItemList(searchItem);
+        bo.setItems(items.stream().map(item -> {
+            return new FmgrePurchaseItemDisplayBo(item);
+        }).collect(Collectors.toList()));
+        List<Long> materailIds = items.stream().map(FmgrePurchaseItem::getMaterailId).collect(Collectors.toList());
+        List<FmgreMaterial> materials = fmgreMaterialService.selectFmgreMaterialByMaterailIds(materailIds);
+        bo.getItems().forEach(item -> {
+            FmgreMaterial materail = materials.stream().filter(material -> material.getMaterailId().equals(item.getMaterailId())).findFirst().orElse(null);
+            item.setMaterail(materail);
+        });
+        if(bo.getSupplierId() != null && bo.getSupplierId() != 0) { 
+            FmgreSupplier supplier = fmgreSupplierService.selectFmgreSupplierBySupplierId(bo.getSupplierId());
+            bo.setSupplier(supplier);
+        }
+        if(bo.getPaymentId() != null && bo.getPaymentId() != 0) {
+            FmgreFinancePaymentDisplayBo payment = new FmgreFinancePaymentDisplayBo(fmgreFinancePaymentService.selectFmgreFinancePaymentByPaymentId(bo.getPaymentId()));
+            bo.setPayment(payment);
+            payment.setUser(sysUserService.selectUserById(payment.getUserId()));
+        }
+        return success(bo);
     }
 
     /**
@@ -130,7 +178,7 @@ public class FmgrePurchaseOrderController extends BaseController
             fmgrePurchaseOrderService.updateFmgrePurchaseOrder(fmgrePurchaseOrderSubmitBo);
         }
         List<FmgreSupplierQuote> fmgreSupplierQuotes = fmgreSupplierQuoteService.selectFmgreSupplierQuoteListByMaterailIdPackUnitDictidLatest(fmgrePurchaseOrderSubmitBo.getSupplierId());
-        for(FmgrePurchaseItemBo fmgrePurchaseItem : fmgrePurchaseOrderSubmitBo.getItems()) {
+        for(FmgrePurchaseItemSubmitBo fmgrePurchaseItem : fmgrePurchaseOrderSubmitBo.getItems()) {
             FmgreSupplierQuote fmgreSupplierQuote = fmgreSupplierQuotes.stream().filter(quote -> 
             quote.getMaterailId().equals(fmgrePurchaseItem.getMaterailId())
                 && quote.getPackUnitDictid().equals(fmgrePurchaseItem.getQuoteUnitDictid())).findFirst().orElse(null);

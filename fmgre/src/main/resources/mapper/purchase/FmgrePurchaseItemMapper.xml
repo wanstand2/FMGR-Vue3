@@ -24,6 +24,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="materail.valuationAmount"    column="valuation_amount"    />
         <result property="materail.priceSale"    column="price_sale"    />
         <result property="materail.storageDictid"    column="storage_dictid"    />
+        
+        <result property="quote.quoteId"    column="quota_id"    />
+        <result property="quote.supplierBrandId"    column="supplier_brand_id"    />
+        <result property="quote.packUnitDictid"    column="pack_unit_dictid"    />
+        <result property="quote.packNum"    column="pack_num"    />
+        <result property="quote.quotaTime"    column="quota_time"    />
+        <result property="quote.quotaPrice"    column="quota_price"    />
+        <result property="quote.quotaComment"    column="quota_comment"    />
+
     </resultMap>
 
     <resultMap type="FmgrePurchaseRequirSummaryBo" id="FmgrePurchaseRequirSummaryBoResult">
@@ -34,11 +43,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="supplierNum"    column="supplier_num"    />
     </resultMap>
 
+    <resultMap type="FmgrePurchaseOrderSummaryBo" id="FmgrePurchaseOrderSummaryBoResult">
+        <result property="orderId"    column="order_id"    />
+        <result property="itemNum"    column="item_num"    />
+    </resultMap>
+
     <sql id="selectFmgrePurchaseItemVo">
         select 
-            item_id, requir_id, order_id, i.materail_id as materail_id, requir_num, requir_unit_dictid, order_num, order_amount, quota_id, supplier_id, item_total_price,
-            materail_type_dictid, materail_code, materail_name, unit_dictid, valuation_amount, price_sale, storage_dictid, order_unit_dictid
-        from fmgre_purchase_item as i LEFT JOIN fmgre_material as m ON i.materail_id = m.materail_id
+            item_id, requir_id, order_id, i.materail_id as materail_id, requir_num, requir_unit_dictid, order_num, order_amount, quota_id, i.supplier_id, item_total_price,
+            materail_type_dictid, materail_code, materail_name, unit_dictid, valuation_amount, price_sale, storage_dictid, order_unit_dictid,
+            supplier_brand_id, pack_unit_dictid, pack_num, quota_price, quota_comment, quota_time
+        from fmgre_purchase_item as i LEFT JOIN fmgre_material as m ON i.materail_id = m.materail_id LEFT JOIN fmgre_supplier_quote as q on i.quota_id = q.quote_id
     </sql>
 
     <select id="selectFmgrePurchaseItemList" parameterType="FmgrePurchaseItem" resultMap="FmgrePurchaseItemResult">
@@ -46,9 +61,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>  
             <if test="requirId != null "> and requir_id = #{requirId}</if>
             <if test="orderId != null "> and order_id = #{orderId}</if>
-            <if test="supplierId != null "> and supplier_id = #{supplierId}</if>
+            <if test="supplierId != null "> and i.supplier_id = #{supplierId}</if>
             <if test="materailId != null "> and materail_id = #{materailId}</if>
-            <if test="params.supplierIdNoneZero != null  and params.supplierIdNoneZero != ''"> and supplier_id > 0</if>
+            <if test="params.supplierIdNoneZero != null  and params.supplierIdNoneZero != ''"> and i.supplier_id > 0</if>
         </where>
     </select>
 
@@ -64,6 +79,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
         group by requir_id
     </select>
+
+    <select id="selectFmgrePurchaseOrderSummaryByOrderIds" parameterType="java.util.Collection" resultMap="FmgrePurchaseOrderSummaryBoResult">
+        select 
+            order_id, count(item_id) as item_num, sum(item_total_price) as item_total_price
+        from fmgre_purchase_item    
+        where order_id in
+        <foreach item="orderId" collection="list" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+        group by order_id
+    </select>
+    
     
     
     <select id="selectFmgrePurchaseItemByItemIds" parameterType="java.util.Collection" resultMap="FmgrePurchaseItemResult">
