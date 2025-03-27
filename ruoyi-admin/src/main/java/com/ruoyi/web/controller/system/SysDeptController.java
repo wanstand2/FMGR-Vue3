@@ -1,6 +1,7 @@
 package com.ruoyi.web.controller.system;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Arrays;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,7 @@ public class SysDeptController extends BaseController
     @GetMapping("/listids")
     public AjaxResult listByIds(Long[] deptIds)
     {
-        List<SysDept> depts = deptService.selectDeptByIds(Arrays.asList(deptIds));
+        List<SysDept> depts = deptService.selectDeptByIds(deptIds == null ? new ArrayList<Long>() : Arrays.asList(deptIds));
         return success(depts);
     }
 

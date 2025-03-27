@@ -24,13 +24,30 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select quote_id, materail_id, supplier_id, supplier_brand_id, pack_unit_dictid, pack_num, pack_size, sub_pack_unit_dictid, sub_pack_num, sub_pack_size, quota_time, quota_price, quota_comment from fmgre_supplier_quote
     </sql>
 
-    <select id="selectFmgreSupplierQuoteListByMaterailIdPackUnitDictidLatest" parameterType="Long" resultMap="FmgreSupplierQuoteResult">
-        select quote_id, q.materail_id, supplier_id, supplier_brand_id, q.pack_unit_dictid, pack_num, pack_size, sub_pack_unit_dictid, sub_pack_num, sub_pack_size, quota_time, quota_price, quota_comment from fmgre_supplier_quote
+    <select id="selectFmgreSupplierQuoteListByMaterailIdPackUnitDictidLatest" parameterType="map" resultMap="FmgreSupplierQuoteResult">
+        select quote_id, q.materail_id, q.supplier_id, supplier_brand_id, q.pack_unit_dictid, pack_num, q.pack_size, sub_pack_unit_dictid, sub_pack_num, sub_pack_size, quota_time, quota_price, quota_comment from fmgre_supplier_quote
         AS q INNER JOIN (
-            SELECT MAX(`quota_time`) as `max_quota_time`,`materail_id`,`pack_unit_dictid`
-            FROM `fmgre_supplier_quote` GROUP BY `materail_id`,`pack_unit_dictid`
-            ) AS qg ON q.quota_time = qg.max_quota_time AND q.materail_id = qg.materail_id AND q.pack_unit_dictid = qg.pack_unit_dictid
-        WHERE q.supplier_id = #{supplierId}
+            SELECT MAX(`quota_time`) as `max_quota_time`,`materail_id`,`pack_unit_dictid`,`supplier_id`, `pack_size`
+            FROM `fmgre_supplier_quote` 
+            WHERE `supplier_id` = #{supplierId} AND `quota_time` &lt;= #{quotaTime} AND `materail_id` IN
+            <foreach item="materailId" collection="materailIds" open="(" separator="," close=")">
+                #{materailId}
+            </foreach>
+            GROUP BY `materail_id`,`pack_unit_dictid`,`pack_size`
+            ) AS qg ON q.quota_time = qg.max_quota_time AND q.materail_id = qg.materail_id 
+            AND q.pack_unit_dictid = qg.pack_unit_dictid AND q.supplier_id = qg.supplier_id AND q.pack_size = qg.pack_size
+    </select>
+
+    <select id="selectFmgreSupplierQuoteListByQuoteIds" parameterType="java.util.Collection" resultMap="FmgreSupplierQuoteResult">
+        select * from fmgre_supplier_quote where quote_id in
+        <if test="collection == null or collection.size == 0">
+            (0)
+        </if>
+        <if test="collection != null and collection.size > 0">
+			<foreach item="quoteId" collection="list" open="(" separator="," close=",0)">
+                #{quoteId}
+            </foreach>
+        </if>
     </select>
 
     <select id="selectFmgreSupplierQuoteList" parameterType="FmgreSupplierQuote" resultMap="FmgreSupplierQuoteResult">
@@ -39,6 +56,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="materailId != null "> and materail_id = #{materailId}</if>
             <if test="supplierId != null "> and supplier_id = #{supplierId}</if>
             <if test="supplierBrandId != null "> and supplier_brand_id = #{supplierBrandId}</if>
+            <if test="packUnitDictid != null "> and pack_unit_dictid = #{packUnitDictid}</if>
+            <if test="packSize != null "> and pack_size = #{packSize}</if>
+            <if test="subPackUnitDictid != null "> and sub_pack_unit_dictid = #{subPackUnitDictid}</if>
+            <if test="subPackSize != null "> and sub_pack_size = #{subPackSize}</if>
+            <if test="subPackNum != null "> and sub_pack_num = #{subPackNum}</if>
+            <if test="quotaTime != null "> and quota_time = #{quotaTime}</if>
             <if test="params.beginQuotaTime != null and params.beginQuotaTime != '' and params.endQuotaTime != null and params.endQuotaTime != ''"> and quota_time between #{params.beginQuotaTime} and #{params.endQuotaTime}</if>
             <if test="params.beginQuotaPrice != null and params.beginQuotaPrice != '' and params.endQuotaPrice != null and params.endQuotaPrice != ''"> and quota_price between #{params.beginQuotaPrice} and #{params.endQuotaPrice}</if>
             <if test="quotaComment != null  and quotaComment != ''"> and quota_comment like concat('%', #{quotaComment}, '%')</if>

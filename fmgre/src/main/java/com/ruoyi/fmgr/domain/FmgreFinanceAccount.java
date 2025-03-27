@@ -50,6 +50,10 @@ public class FmgreFinanceAccount extends BaseEntity
     @Excel(name = "账户余额")
     private BigDecimal accountBalance;
 
+    /** 账户显示别名 */
+    @Excel(name = "账户显示别名")
+    private String accountAlias;
+
     /** 账户显示名称 */
     @Excel(name = "账户显示名称")
     private String accountDisplay;
@@ -137,16 +141,25 @@ public class FmgreFinanceAccount extends BaseEntity
         return accountBalance;
     }
 
+    public void setAccountAlias(String accountAlias) 
+    {
+        this.accountAlias = accountAlias;
+    }   
+
+    public String getAccountAlias() 
+    {
+        return accountAlias;
+    }
+
     public void setAccountDisplay(String accountDisplay) 
     {
         this.accountDisplay = accountDisplay;
-    }   
+    }
 
     public String getAccountDisplay() 
     {
         return accountDisplay;
-    }
-
+    }   
 
     @Override
     public String toString() {
@@ -160,6 +173,7 @@ public class FmgreFinanceAccount extends BaseEntity
             .append("bankId", getBankId())
             .append("bankInfo", getBankInfo())
             .append("accountBalance", getAccountBalance())
+            .append("accountAlias", getAccountAlias())
             .append("accountDisplay", getAccountDisplay())
             .toString();
     }

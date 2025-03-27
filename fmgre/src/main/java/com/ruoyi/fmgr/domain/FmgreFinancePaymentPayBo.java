@@ -5,12 +5,17 @@ import java.util.List;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 public class FmgreFinancePaymentPayBo {
 
     private Long accountId;
 
     private List<Long> orderIds;
+
+	private String comment;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private Date paymentTime;
     
     public Date getPaymentTime() {
 		return paymentTime;
@@ -19,9 +24,6 @@ public class FmgreFinancePaymentPayBo {
 	public void setPaymentTime(Date paymentTime) {
 		this.paymentTime = paymentTime;
 	}
-
-
-	private Date paymentTime;
 
 	public Long getAccountId() {
 		return accountId;
@@ -39,6 +41,13 @@ public class FmgreFinancePaymentPayBo {
 		this.orderIds = orderIds;
 	}
 
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
 
     @Override
     public String toString() {
@@ -46,6 +55,7 @@ public class FmgreFinancePaymentPayBo {
             .append("accountId", getAccountId())
             .append("orderIds", getOrderIds())
             .append("paymentTime", getPaymentTime())
+			.append("comment", getComment())
             .toString();
     }
 }

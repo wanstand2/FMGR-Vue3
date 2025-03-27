@@ -2,6 +2,8 @@ package com.ruoyi.fmgr.controller;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,6 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.fmgr.domain.FmgrePurchaseItem;
 import com.ruoyi.fmgr.service.IFmgrePurchaseItemService;
-import com.ruoyi.fmgr.domain.FmgreFinancePayment;
 import com.ruoyi.fmgr.domain.FmgreFinancePaymentDisplayBo;
 import com.ruoyi.fmgr.service.IFmgreFinancePaymentService;
 import com.ruoyi.fmgr.domain.FmgreSupplierQuote;
@@ -40,6 +41,10 @@ import com.ruoyi.fmgr.domain.FmgreMaterial;
 import com.ruoyi.fmgr.service.IFmgreMaterialService;
 import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.fmgr.domain.FmgrePurchaseOrderSummaryBo;
+import com.ruoyi.fmgr.domain.FmgreFinancePaymentPayBo;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 /**
  * 采购订单Controller
  * 
@@ -70,6 +75,9 @@ public class FmgrePurchaseOrderController extends BaseController
 
     @Autowired
     private ISysUserService sysUserService;
+
+    @Autowired
+    private FmgreFinancePaymentController fmgreFinancePaymentController;
 
     /**
      * 查询采购订单列表
@@ -150,7 +158,7 @@ public class FmgrePurchaseOrderController extends BaseController
      * 提交采购订单
      */
     @PreAuthorize("@ss.hasPermi('purchase:act:doorder')")
-    @Log(title = "采购订单", businessType = BusinessType.INSERT)
+    @Log(title = "采购订单", businessType = BusinessType.UPDATE)
     @PostMapping("/submit")
     @Transactional(rollbackFor = Exception.class)
     public AjaxResult submit(@RequestBody FmgrePurchaseOrderSubmitBo fmgrePurchaseOrderSubmitBo)
@@ -158,12 +166,19 @@ public class FmgrePurchaseOrderController extends BaseController
         if(fmgrePurchaseOrderSubmitBo.getItems() == null || fmgrePurchaseOrderSubmitBo.getItems().isEmpty()) {
             return toAjax(0);
         }
+        System.out.println("ordercode=" + fmgrePurchaseOrderSubmitBo.getOrderCode());
         if(fmgrePurchaseOrderSubmitBo.getOrderId() == null || fmgrePurchaseOrderSubmitBo.getOrderId() == 0) {
             BigDecimal totalPrice = fmgrePurchaseOrderSubmitBo.getItems().stream()
                 .filter(fmgrePurchaseItem -> fmgrePurchaseItem.getItemTotalPrice() != null && (fmgrePurchaseItem.getOrderId() == null || fmgrePurchaseItem.getOrderId() == 0))
                 .map(FmgrePurchaseItem::getItemTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
             fmgrePurchaseOrderSubmitBo.setOrderTotalPrice(totalPrice);
-            fmgrePurchaseOrderSubmitBo.setUserId(getUserId());
+            if(
+                getUserId().equals(1L) && fmgrePurchaseOrderSubmitBo.getUserId() != null && 
+                    fmgrePurchaseOrderSubmitBo.getUserId() != 0) {
+                        //管理员可以保留设置
+            } else {
+                fmgrePurchaseOrderSubmitBo.setUserId(getUserId());
+            }
             fmgrePurchaseOrderSubmitBo.setSupplierId(fmgrePurchaseOrderSubmitBo.getItems().get(0).getSupplierId());
             fmgrePurchaseOrderService.insertFmgrePurchaseOrder(fmgrePurchaseOrderSubmitBo);
         } else {
@@ -177,45 +192,57 @@ public class FmgrePurchaseOrderController extends BaseController
             fmgrePurchaseOrderSubmitBo.setOrderTotalPrice(totalPrice);
             fmgrePurchaseOrderService.updateFmgrePurchaseOrder(fmgrePurchaseOrderSubmitBo);
         }
-        List<FmgreSupplierQuote> fmgreSupplierQuotes = fmgreSupplierQuoteService.selectFmgreSupplierQuoteListByMaterailIdPackUnitDictidLatest(fmgrePurchaseOrderSubmitBo.getSupplierId());
+        Date orderTime = fmgrePurchaseOrderSubmitBo.getOrderTime();
+        if(orderTime == null) {
+            orderTime = new Date();
+            orderTime.setHours(0);
+            orderTime.setMinutes(0);
+            orderTime.setSeconds(0);
+        }
+        Map<Long, FmgreSupplierQuote> fmgreSupplierQuoteMap = new HashMap<>();
+        fmgreSupplierQuoteService.selectFmgreSupplierQuoteListByQuoteIds(
+            fmgrePurchaseOrderSubmitBo.getItems().stream().map(FmgrePurchaseItemSubmitBo::getQuotaId).collect(Collectors.toList()))
+            .forEach(quote -> {
+                fmgreSupplierQuoteMap.put(quote.getQuoteId(), quote);
+            });
         for(FmgrePurchaseItemSubmitBo fmgrePurchaseItem : fmgrePurchaseOrderSubmitBo.getItems()) {
-            FmgreSupplierQuote fmgreSupplierQuote = fmgreSupplierQuotes.stream().filter(quote -> 
-            quote.getMaterailId().equals(fmgrePurchaseItem.getMaterailId())
-                && quote.getPackUnitDictid().equals(fmgrePurchaseItem.getQuoteUnitDictid())).findFirst().orElse(null);
-            if(fmgreSupplierQuote == null ||
-                !fmgreSupplierQuote.getQuotaPrice().equals(fmgrePurchaseItem.getQuotePrice())) {
-                FmgreSupplierQuote newQuote = new FmgreSupplierQuote();
-                newQuote.setMaterailId(fmgrePurchaseItem.getMaterailId());
-                newQuote.setPackUnitDictid(fmgrePurchaseItem.getQuoteUnitDictid());
-                newQuote.setSupplierId(fmgrePurchaseOrderSubmitBo.getSupplierId());
-                newQuote.setSupplierBrandId(fmgrePurchaseItem.getBrandId());
-                newQuote.setQuotaPrice(fmgrePurchaseItem.getQuotePrice());
-                newQuote.setQuotaTime(fmgrePurchaseOrderSubmitBo.getOrderTime());
-                if(fmgreSupplierQuote != null) {
-                    //已有过同类报价，则使用同类报价的规格
-                    newQuote.setPackSize(fmgreSupplierQuote.getPackSize());
-                    newQuote.setSubPackNum(fmgreSupplierQuote.getSubPackNum());
-                    newQuote.setSubPackUnitDictid(fmgreSupplierQuote.getSubPackUnitDictid());
-                    newQuote.setSubPackSize(fmgreSupplierQuote.getSubPackSize());
-                }
-                fmgreSupplierQuoteService.insertFmgreSupplierQuote(newQuote);
-                fmgreSupplierQuote = newQuote;
+            FmgreSupplierQuote fmgreSupplierQuote = fmgreSupplierQuoteMap.get(fmgrePurchaseItem.getQuotaId());
+            if(fmgreSupplierQuote == null) {
+                throw new RuntimeException("供应商报价不存在");
+            }
+            if(!fmgreSupplierQuote.getMaterailId().equals(fmgrePurchaseItem.getMaterailId())
+            || !fmgreSupplierQuote.getSupplierId().equals(fmgrePurchaseItem.getSupplierId())) {
+                throw new RuntimeException("报价和原始需求不匹配");
+            }
+            if(fmgreSupplierQuote.getQuotaPrice().compareTo(fmgrePurchaseItem.getQuotePrice()) != 0) {
+                fmgreSupplierQuote.setQuotaPrice(fmgrePurchaseItem.getQuotePrice());
+                fmgreSupplierQuote.setQuoteId(null);
+                fmgreSupplierQuote.setQuotaTime(orderTime);
+                fmgreSupplierQuoteService.insertFmgreSupplierQuote(fmgreSupplierQuote);
             }
             fmgrePurchaseItem.setOrderId(fmgrePurchaseOrderSubmitBo.getOrderId());
             fmgrePurchaseItem.setQuotaId(fmgreSupplierQuote.getQuoteId());
+            //重新计算采购数量和总价
+            fmgrePurchaseItem.setOrderUnitDictid(fmgreSupplierQuote.getPackUnitDictid());
+            fmgrePurchaseItem.setOrderAmount(fmgrePurchaseItem.getOrderNum().multiply(fmgreSupplierQuote.getPackSize()));
+            fmgrePurchaseItem.setItemTotalPrice(fmgrePurchaseItem.getOrderNum().multiply(fmgrePurchaseItem.getQuotePrice()));
             fmgrePurchaseItemService.updateFmgrePurchaseItem(fmgrePurchaseItem);
         }
+        BigDecimal orderTotalPrice = fmgrePurchaseOrderService.getOrdersTotalPrice(Arrays.asList(fmgrePurchaseOrderSubmitBo.getOrderId()));
+
+        //总价以计算为准
+        if(orderTotalPrice.compareTo(fmgrePurchaseOrderSubmitBo.getOrderTotalPrice()) != 0) {
+            FmgrePurchaseOrder qorder = new FmgrePurchaseOrder();
+            qorder.setOrderId(fmgrePurchaseOrderSubmitBo.getOrderId());
+            qorder.setOrderTotalPrice(orderTotalPrice);
+            fmgrePurchaseOrderService.updateFmgrePurchaseOrder(qorder);
+        }
         if(fmgrePurchaseOrderSubmitBo.getAccountId() != null && fmgrePurchaseOrderSubmitBo.getAccountId() != 0) {
-            FmgreFinancePayment fmgreFinancePayment = new FmgreFinancePayment();
-            fmgreFinancePayment.setOutAccId(fmgrePurchaseOrderSubmitBo.getAccountId());
-            fmgreFinancePayment.setPaymentAmount(fmgrePurchaseOrderSubmitBo.getOrderTotalPrice());
-            fmgreFinancePayment.setUserId(getUserId());
-            fmgreFinancePayment.setOrderId(fmgrePurchaseOrderSubmitBo.getOrderId());
-            fmgreFinancePaymentService.insertFmgreFinancePayment(fmgreFinancePayment);
-            FmgrePurchaseOrder upOrder = new FmgrePurchaseOrder();
-            upOrder.setOrderId(fmgrePurchaseOrderSubmitBo.getOrderId());
-            upOrder.setPaymentId(fmgreFinancePayment.getPaymentId());
-            fmgrePurchaseOrderService.updateFmgrePurchaseOrder(upOrder);
+            FmgreFinancePaymentPayBo payBo = new FmgreFinancePaymentPayBo();
+            payBo.setOrderIds(Arrays.asList(fmgrePurchaseOrderSubmitBo.getOrderId()));
+            payBo.setAccountId(fmgrePurchaseOrderSubmitBo.getAccountId());
+            payBo.setPaymentTime(fmgrePurchaseOrderSubmitBo.getOrderTime());
+            fmgreFinancePaymentController._pay(payBo);
         }
         return toAjax(1);
     }

@@ -6,6 +6,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * 付款流水对象 fmgre_finance_payment
@@ -45,6 +46,7 @@ public class FmgreFinancePayment extends BaseEntity
     private BigDecimal paymentAmount;
 
     /** 支付时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Excel(name = "支付时间")
     private Date paymentTime;
 

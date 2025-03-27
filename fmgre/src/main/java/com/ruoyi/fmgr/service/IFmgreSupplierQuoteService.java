@@ -1,6 +1,8 @@
 package com.ruoyi.fmgr.service;
 
 import java.util.List;
+import java.util.Collection;
+import java.util.Date;
 import com.ruoyi.fmgr.domain.FmgreSupplierQuote;
 
 /**
@@ -26,6 +28,7 @@ public interface IFmgreSupplierQuoteService
      * @return 供应商报价集合
      */
     public List<FmgreSupplierQuote> selectFmgreSupplierQuoteList(FmgreSupplierQuote fmgreSupplierQuote);
+    public List<FmgreSupplierQuote> selectFmgreSupplierQuoteListByQuoteIds(Collection<Long> quoteIds);
 
     /**
      * 查询供应商报价列表
@@ -33,7 +36,7 @@ public interface IFmgreSupplierQuoteService
      * @param supplierId 供应商ID
      * @return 供应商报价集合
      */
-    public List<FmgreSupplierQuote> selectFmgreSupplierQuoteListByMaterailIdPackUnitDictidLatest(Long supplierId);
+    public List<FmgreSupplierQuote> selectFmgreSupplierQuoteListByMaterailIdPackUnitDictidLatest(Long supplierId, Date quotaTime, Long[] materailIds);
 
     /**
      * 新增供应商报价

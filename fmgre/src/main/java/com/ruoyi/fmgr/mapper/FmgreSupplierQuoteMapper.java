@@ -1,7 +1,10 @@
 package com.ruoyi.fmgr.mapper;
 
 import java.util.List;
+import java.util.Collection;
 import com.ruoyi.fmgr.domain.FmgreSupplierQuote;
+import org.apache.ibatis.annotations.Param;
+import java.util.Date;
 
 /**
  * 供应商报价Mapper接口
@@ -27,13 +30,16 @@ public interface FmgreSupplierQuoteMapper
      */
     public List<FmgreSupplierQuote> selectFmgreSupplierQuoteList(FmgreSupplierQuote fmgreSupplierQuote);
 
+    public List<FmgreSupplierQuote> selectFmgreSupplierQuoteListByQuoteIds(Collection<Long> quoteIds);
+
     /**
      * 查询供应商报价列表
      * 
      * @param supplierId 供应商ID
      * @return 供应商报价集合
      */
-    public List<FmgreSupplierQuote> selectFmgreSupplierQuoteListByMaterailIdPackUnitDictidLatest(Long supplierId);
+    public List<FmgreSupplierQuote> selectFmgreSupplierQuoteListByMaterailIdPackUnitDictidLatest(
+        @Param("supplierId") Long supplierId, @Param("quotaTime") Date quotaTime, @Param("materailIds") Long[] materailIds);
 
     /**
      * 新增供应商报价

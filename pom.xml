@@ -223,6 +223,12 @@
                 <artifactId>fmgre</artifactId>
                 <version>0.0.1</version>
             </dependency>
+            
+	    	<dependency>
+	    		<groupId>com.ruoyi</groupId>
+	    		<artifactId>fmgre-commiter</artifactId>
+	    		<version>0.0.1</version>
+	    	</dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -235,7 +241,9 @@
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
         <module>fmgre</module>
+        <module>fmgre-commiter</module>
     </modules>
+    
     <packaging>pom</packaging>
 
     <build>
@@ -277,5 +285,4 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
-
 </project>

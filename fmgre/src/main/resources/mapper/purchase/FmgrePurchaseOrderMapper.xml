@@ -33,7 +33,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="userId != null "> and user_id = #{userId}</if>
             <if test="supplierId != null "> and supplier_id = #{supplierId}</if>
             <if test="paymentId != null "> and payment_id = #{paymentId}</if>
+            <!--
             <if test="orderCode != null  and orderCode != ''"> and order_code like concat('%', #{orderCode}, '%')</if>
+            -->
+            <if test="orderCode != null "> and order_code = #{orderCode}</if>
             <if test="deliveryDictid != null  and deliveryDictid != ''"> and delivery_dictid = #{deliveryDictid}</if>
             <if test="params.beginOrderTime != null and params.beginOrderTime != '' and params.endOrderTime != null and params.endOrderTime != ''"> and order_time between #{params.beginOrderTime} and #{params.endOrderTime}</if>
             <if test="orderComment != null  and orderComment != ''"> and order_comment like concat('%', #{orderComment}, '%')</if>

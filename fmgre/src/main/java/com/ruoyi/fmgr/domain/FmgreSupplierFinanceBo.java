@@ -5,7 +5,7 @@ import java.util.Date;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * 供应商财务统计
@@ -17,6 +17,7 @@ public class FmgreSupplierFinanceBo {
     
 	private Long supplierId;
 	
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date orderTime;
     
     private BigDecimal debtAmount;

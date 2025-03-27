@@ -30,7 +30,7 @@ public class FmgrePurchaseOrderSubmitBo extends FmgrePurchaseOrder {
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append(super.toString())
-            .append("fmgrePurchaseItems", getItems())
+            .append("items", getItems())
             .append("accountId", getAccountId())
             .toString();
     }

@@ -1,11 +1,13 @@
 package com.ruoyi.fmgr.service.impl;
 
 import java.util.List;
+import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.fmgr.mapper.FmgreSupplierQuoteMapper;
 import com.ruoyi.fmgr.domain.FmgreSupplierQuote;
 import com.ruoyi.fmgr.service.IFmgreSupplierQuoteService;
+import java.util.Date;
 
 /**
  * 供应商报价Service业务层处理
@@ -43,6 +45,12 @@ public class FmgreSupplierQuoteServiceImpl implements IFmgreSupplierQuoteService
         return fmgreSupplierQuoteMapper.selectFmgreSupplierQuoteList(fmgreSupplierQuote);
     }
 
+    @Override
+    public List<FmgreSupplierQuote> selectFmgreSupplierQuoteListByQuoteIds(Collection<Long> quoteIds)
+    {
+        return fmgreSupplierQuoteMapper.selectFmgreSupplierQuoteListByQuoteIds(quoteIds);
+    }
+
     /**
      * 查询供应商报价列表
      * 
@@ -50,9 +58,9 @@ public class FmgreSupplierQuoteServiceImpl implements IFmgreSupplierQuoteService
      * @return 供应商报价集合
      */
     @Override
-    public List<FmgreSupplierQuote> selectFmgreSupplierQuoteListByMaterailIdPackUnitDictidLatest(Long supplierId)
+    public List<FmgreSupplierQuote> selectFmgreSupplierQuoteListByMaterailIdPackUnitDictidLatest(Long supplierId, Date quotaTime, Long[] materailIds)
     {
-        return fmgreSupplierQuoteMapper.selectFmgreSupplierQuoteListByMaterailIdPackUnitDictidLatest(supplierId);
+        return fmgreSupplierQuoteMapper.selectFmgreSupplierQuoteListByMaterailIdPackUnitDictidLatest(supplierId, quotaTime, materailIds);
     }
 
     /**

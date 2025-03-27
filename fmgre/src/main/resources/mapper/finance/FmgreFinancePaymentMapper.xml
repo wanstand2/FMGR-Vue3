@@ -50,6 +50,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="paymentComment != null">payment_comment,</if>
             <if test="paymentAmount != null">payment_amount,</if>
             <if test="paymentTime != null">payment_time,</if>
+            <if test="outAccBanlance != null">out_acc_banlance,</if>
+            <if test="inAccBanlance != null">in_acc_banlance,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="outAccId != null">#{outAccId},</if>
@@ -59,6 +61,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="paymentComment != null">#{paymentComment},</if>
             <if test="paymentAmount != null">#{paymentAmount},</if>
             <if test="paymentTime != null">#{paymentTime},</if>
+            <if test="outAccBanlance != null">#{outAccBanlance},</if>
+            <if test="inAccBanlance != null">#{inAccBanlance},</if>
          </trim>
     </insert>
 
@@ -72,6 +76,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="paymentComment != null">payment_comment = #{paymentComment},</if>
             <if test="paymentAmount != null">payment_amount = #{paymentAmount},</if>
             <if test="paymentTime != null">payment_time = #{paymentTime},</if>
+            <if test="outAccBanlance != null">out_acc_banlance = #{outAccBanlance},</if>
+            <if test="inAccBanlance != null">in_acc_banlance = #{inAccBanlance},</if>
         </trim>
         where payment_id = #{paymentId}
     </update>

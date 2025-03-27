@@ -681,4 +681,29 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils
         }
         return sb.toString();
     }
+    
+
+	
+    public static String objectToString(Object o) {
+		if(o == null) return "";
+		Class c = o.getClass();
+		if(c.isPrimitive()) {
+			if(c.equals(int.class)) {
+				return String.valueOf((int)o);
+			} else if(c.equals(long.class)) {
+				return String.valueOf((long)o);
+			} else if(c.equals(float.class)) {
+				return String.valueOf((float)o);
+			} else if(c.equals(double.class)) {
+				return String.valueOf((double)o);
+			} else if(c.equals(byte.class)) {
+				return String.valueOf((byte)o);
+			} else if(c.equals(char.class)) {
+				return String.valueOf((char)o);
+			} else if(c.equals(boolean.class)) {
+				return String.valueOf((boolean)o);
+			}
+		}
+		return o.toString();
+	}
 }

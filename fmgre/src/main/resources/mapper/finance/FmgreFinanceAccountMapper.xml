@@ -13,10 +13,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="accountNumber"    column="account_number"    />
         <result property="bankId"    column="bank_id"    />
         <result property="bankInfo"    column="bank_info"    />
+        <result property="accountAlias"    column="account_alias"    />
     </resultMap>
 
     <sql id="selectFmgreFinanceAccountVo">
-        select account_id, user_id, dept_id, account_dictid, account_name, account_number, bank_id, bank_info from fmgre_finance_account
+        select account_id, user_id, dept_id, account_dictid, account_name, account_number, bank_id, bank_info, account_alias from fmgre_finance_account
     </sql>
 
     <select id="selectFmgreFinanceAccountList" parameterType="FmgreFinanceAccount" resultMap="FmgreFinanceAccountResult">
@@ -29,6 +30,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="accountNumber != null  and accountNumber != ''"> and account_number like concat('%', #{accountNumber}, '%')</if>
             <if test="bankId != null "> and bank_id = #{bankId}</if>
             <if test="bankInfo != null  and bankInfo != ''"> and bank_info like concat('%', #{bankInfo}, '%')</if>
+            <if test="accountAlias != null  and accountAlias != ''"> and account_alias like concat('%', #{accountAlias}, '%')</if>
         </where>
     </select>
     
@@ -47,6 +49,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="accountNumber != null">account_number,</if>
             <if test="bankId != null">bank_id,</if>
             <if test="bankInfo != null">bank_info,</if>
+            <if test="accountAlias != null">account_alias,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="userId != null">#{userId},</if>
@@ -56,6 +59,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="accountNumber != null">#{accountNumber},</if>
             <if test="bankId != null">#{bankId},</if>
             <if test="bankInfo != null">#{bankInfo},</if>
+            <if test="accountAlias != null">#{accountAlias},</if>
          </trim>
     </insert>
 
@@ -69,6 +73,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="accountNumber != null">account_number = #{accountNumber},</if>
             <if test="bankId != null">bank_id = #{bankId},</if>
             <if test="bankInfo != null">bank_info = #{bankInfo},</if>
+            <if test="accountAlias != null">account_alias = #{accountAlias},</if>
         </trim>
         where account_id = #{accountId}
     </update>

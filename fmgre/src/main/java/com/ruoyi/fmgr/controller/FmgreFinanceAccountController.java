@@ -73,7 +73,7 @@ public class FmgreFinanceAccountController extends BaseController
         });
         list.forEach(item -> {
             banks.stream().filter(bank -> bank.getbankId().equals(item.getBankId())).findFirst().ifPresent(bank -> item.setAccountDisplay(
-                item.getAccountDisplay() + "@" + bank.getBankName()));
+                item.getAccountDisplay() + "@" + bank.getBankName() + "(" + item.getAccountAlias() + ")"));
         });
         return getDataTable(list);
     }

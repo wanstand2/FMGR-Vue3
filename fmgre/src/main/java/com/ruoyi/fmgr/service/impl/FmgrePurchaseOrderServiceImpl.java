@@ -58,8 +58,10 @@ public class FmgrePurchaseOrderServiceImpl implements IFmgrePurchaseOrderService
     @Override
     public int insertFmgrePurchaseOrder(FmgrePurchaseOrder fmgrePurchaseOrder)
     {
-        String code = codeGenerater.generateCode("fmgre_purchase_order", 4, fmgrePurchaseOrder.getOrderTime());
-        fmgrePurchaseOrder.setOrderCode(code);
+        if(fmgrePurchaseOrder.getOrderCode() == null || fmgrePurchaseOrder.getOrderCode().isEmpty()) {  
+            String code = codeGenerater.generateCode("fmgre_purchase_order", 4, fmgrePurchaseOrder.getOrderTime());
+            fmgrePurchaseOrder.setOrderCode(code);
+        }
         return fmgrePurchaseOrderMapper.insertFmgrePurchaseOrder(fmgrePurchaseOrder);
     }
 

@@ -3,7 +3,9 @@ package com.ruoyi.fmgr.domain;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-public class FmgrePurchaseOrderSummaryBo {
+import com.ruoyi.common.core.domain.BaseEntity;
+
+public class FmgrePurchaseOrderSummaryBo extends BaseEntity {
     private Long orderId;
     private Integer itemNum;
 

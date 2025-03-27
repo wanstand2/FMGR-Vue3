@@ -38,7 +38,7 @@ public class FmgreSupplierQuote extends BaseEntity
     private String packUnitDictid;
 
     /** 包装数量(子包装数) */
-    @Excel(name = "包装数量(子包装数)")
+    @Excel(name = "包装数量(子包装数)(弃用)")
     private BigDecimal packNum;
 
     /** 包装大小(包装总和) */

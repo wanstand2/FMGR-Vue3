@@ -105,6 +105,15 @@ public class FmgreFinancePaymentController extends BaseController
         if(fmgreFinancePayment.getInAccId() != null) {
             fmgreFinanceAccountBalanceService.updateFmgreFinanceAccountBalanceByAccountId(fmgreFinancePayment.getInAccId());
         }
+        FmgreFinancePayment updPayment = new FmgreFinancePayment();
+        updPayment.setPaymentId(fmgreFinancePayment.getPaymentId());
+        if(fmgreFinancePayment.getOutAccId() != null) { 
+            updPayment.setOutAccBanlance(fmgreFinanceAccountBalanceService.selectFmgreFinanceAccountBalanceByAccountId(fmgreFinancePayment.getOutAccId()).getAccountBalance());
+        }
+        if(fmgreFinancePayment.getInAccId() != null) {
+            updPayment.setInAccBanlance(fmgreFinanceAccountBalanceService.selectFmgreFinanceAccountBalanceByAccountId(fmgreFinancePayment.getInAccId()).getAccountBalance());
+        }
+        fmgreFinancePaymentService.updateFmgreFinancePayment(updPayment);
         return toAjax(ret);
     }
 
@@ -115,6 +124,10 @@ public class FmgreFinancePaymentController extends BaseController
     @Log(title = "付款流水", businessType = BusinessType.INSERT)
     @PostMapping(value = "/pay")
     public AjaxResult pay(@RequestBody FmgreFinancePaymentPayBo fmgreFinancePaymentPayBo) {
+    	return this._pay(fmgreFinancePaymentPayBo);
+    }
+    
+    public AjaxResult _pay(@RequestBody FmgreFinancePaymentPayBo fmgreFinancePaymentPayBo) {
         if(fmgreFinancePaymentPayBo.getOrderIds() == null || fmgreFinancePaymentPayBo.getOrderIds().size() == 0) {
             return toAjax(0);
         }
@@ -124,7 +137,15 @@ public class FmgreFinancePaymentController extends BaseController
         fmgreFinancePayment.setOrderId(fmgreFinancePaymentPayBo.getOrderIds().get(0));
         fmgreFinancePayment.setPaymentTime(fmgreFinancePaymentPayBo.getPaymentTime()); 
         fmgreFinancePayment.setPaymentAmount(total);
-        fmgreFinancePayment.setPaymentComment("财务付款");
+        FmgrePurchaseOrder order = fmgrePurchaseOrderService.selectFmgrePurchaseOrderByOrderId(fmgreFinancePaymentPayBo.getOrderIds().get(0));
+        if(fmgreFinancePaymentPayBo.getComment() == null || fmgreFinancePaymentPayBo.getComment().length() == 0) {
+            if(fmgreFinancePaymentPayBo.getOrderIds().size() < 2) {
+                fmgreFinancePaymentPayBo.setComment("支付订单："+order.getOrderCode());
+            } else {
+                fmgreFinancePaymentPayBo.setComment("支付多个订单（"+fmgreFinancePaymentPayBo.getOrderIds().size()+"）："+order.getOrderCode());
+            }
+        }
+        fmgreFinancePayment.setPaymentComment(fmgreFinancePaymentPayBo.getComment() == null ? "订单付款" : fmgreFinancePaymentPayBo.getComment());
         fmgreFinancePayment.setUserId(getUserId());
         this.add(fmgreFinancePayment);
         fmgrePurchaseOrderService.updateFmgrePurchaseOrderPaymentId(fmgreFinancePaymentPayBo.getOrderIds(), fmgreFinancePayment.getPaymentId());
