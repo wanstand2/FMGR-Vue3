@@ -27,6 +27,8 @@ public interface FmgreFinancePaymentMapper
      * @return 付款流水集合
      */
     public List<FmgreFinancePayment> selectFmgreFinancePaymentList(FmgreFinancePayment fmgreFinancePayment);
+    
+    public List<FmgreFinancePayment> selectFmgreFinancePaymentIdsLater(FmgreFinancePayment fmgreFinancePayment);
 
     /**
      * 新增付款流水
@@ -43,7 +45,14 @@ public interface FmgreFinancePaymentMapper
      * @return 结果
      */
     public int updateFmgreFinancePayment(FmgreFinancePayment fmgreFinancePayment);
+    
+    public int updateFmgreFinancePaymentBanlance(FmgreFinancePayment fmgreFinancePayment);
 
+    public int updateFmgreFinancePaymentBanlancesOutOutAcc(FmgreFinancePayment fmgreFinancePayment);
+    public int updateFmgreFinancePaymentBanlancesOutInAcc(FmgreFinancePayment fmgreFinancePayment);
+    public int updateFmgreFinancePaymentBanlancesInInAcc(FmgreFinancePayment fmgreFinancePayment);
+    public int updateFmgreFinancePaymentBanlancesInOutAcc(FmgreFinancePayment fmgreFinancePayment);
+    
     /**
      * 删除付款流水
      * 

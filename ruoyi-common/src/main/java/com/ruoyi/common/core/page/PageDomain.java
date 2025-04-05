@@ -16,21 +16,26 @@ public class PageDomain
     private Integer pageSize;
 
     /** 排序列 */
-    private String orderByColumn;
+    private String[] orderByColumn;
 
     /** 排序的方向desc或者asc */
-    private String isAsc = "asc";
+    private String[] isAsc = {"asc"};
 
     /** 分页参数合理化 */
     private Boolean reasonable = true;
 
     public String getOrderBy()
     {
-        if (StringUtils.isEmpty(orderByColumn))
+        if (orderByColumn == null || orderByColumn.length == 0)
         {
             return "";
         }
-        return StringUtils.toUnderScoreCase(orderByColumn) + " " + isAsc;
+        String ret = "";
+        for(int i=0;i<orderByColumn.length && i<isAsc.length;i++) {
+            if(i>0) ret+= ", ";
+            ret += (StringUtils.toUnderScoreCase(orderByColumn[i]) + " " + isAsc[i]);
+        }
+        return ret;
     }
 
     public Integer getPageNum()
@@ -53,17 +58,19 @@ public class PageDomain
         this.pageSize = pageSize;
     }
 
-    public String getOrderByColumn()
+    public String[] getOrderByColumn()
     {
         return orderByColumn;
     }
 
     public void setOrderByColumn(String orderByColumn)
     {
-        this.orderByColumn = orderByColumn;
+        if(StringUtils.isNotEmpty(orderByColumn)) {
+            this.orderByColumn = orderByColumn.split("-");
+        }
     }
 
-    public String getIsAsc()
+    public String[] getIsAsc()
     {
         return isAsc;
     }
@@ -72,16 +79,19 @@ public class PageDomain
     {
         if (StringUtils.isNotEmpty(isAsc))
         {
-            // 兼容前端排序类型
-            if ("ascending".equals(isAsc))
-            {
-                isAsc = "asc";
+            String[] isAscs = isAsc.split("-");
+            this.isAsc = new String[isAsc.length()];
+            for(int i=0;i<isAscs.length;i++) {
+                // 兼容前端排序类型
+                if ("ascending".equals(isAscs[i]))
+                {
+                    this.isAsc[i] = "asc";
+                }
+                else if ("descending".equals(isAscs[i]))
+                {
+                    this.isAsc[i] = "desc";
+                }
             }
-            else if ("descending".equals(isAsc))
-            {
-                isAsc = "desc";
-            }
-            this.isAsc = isAsc;
         }
     }
 

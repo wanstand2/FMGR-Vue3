@@ -32,11 +32,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="bankInfo != null  and bankInfo != ''"> and bank_info like concat('%', #{bankInfo}, '%')</if>
             <if test="accountAlias != null  and accountAlias != ''"> and account_alias like concat('%', #{accountAlias}, '%')</if>
         </where>
+		${params.dataScope}
     </select>
     
     <select id="selectFmgreFinanceAccountByAccountId" parameterType="Long" resultMap="FmgreFinanceAccountResult">
         <include refid="selectFmgreFinanceAccountVo"/>
         where account_id = #{accountId}
+		${params.dataScope}
     </select>
 
     <insert id="insertFmgreFinanceAccount" parameterType="FmgreFinanceAccount" useGeneratedKeys="true" keyProperty="accountId">

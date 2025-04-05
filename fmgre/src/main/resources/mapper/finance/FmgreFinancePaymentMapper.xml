@@ -39,8 +39,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectFmgreFinancePaymentVo"/>
         where payment_id = #{paymentId}
     </select>
+    
+    <select id="selectFmgreFinancePaymentIdsLater" parameterType="FmgreFinancePayment" resultMap="FmgreFinancePaymentResult">
+		select payment_id, out_acc_id, in_acc_id, payment_time from fmgre_finance_payment where (payment_time &gt; #{paymentTime} or (payment_time = #{paymentTime} and payment_id &gt; #{paymentId})) order by payment_time desc, payment_id desc
+	</select>
 
     <insert id="insertFmgreFinancePayment" parameterType="FmgreFinancePayment" useGeneratedKeys="true" keyProperty="paymentId">
+	    <selectKey keyProperty="paymentId" order="AFTER" resultType="java.lang.Long">
+          SELECT LAST_INSERT_ID()
+        </selectKey>
         insert into fmgre_finance_payment
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="outAccId != null">out_acc_id,</if>
@@ -50,8 +57,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="paymentComment != null">payment_comment,</if>
             <if test="paymentAmount != null">payment_amount,</if>
             <if test="paymentTime != null">payment_time,</if>
-            <if test="outAccBanlance != null">out_acc_banlance,</if>
-            <if test="inAccBanlance != null">in_acc_banlance,</if>
+            <if test="outAccId != null and outAccId != 0">out_acc_banlance,</if>
+            <if test="inAccId != null and inAccId != 0">in_acc_banlance,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="outAccId != null">#{outAccId},</if>
@@ -60,9 +67,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="orderId != null">#{orderId},</if>
             <if test="paymentComment != null">#{paymentComment},</if>
             <if test="paymentAmount != null">#{paymentAmount},</if>
-            <if test="paymentTime != null">#{paymentTime},</if>
-            <if test="outAccBanlance != null">#{outAccBanlance},</if>
-            <if test="inAccBanlance != null">#{inAccBanlance},</if>
+            <if test="paymentTime != null">#{paymentTime},</if>          
+            <if test="outAccId != null and outAccId != 0">
+                (select COALESCE(t2.sum_payment_amount2,0) from 
+                    (select t1.sum_payment_amount1 as sum_payment_amount2 from
+                        (select sum(payment_amount) as sum_payment_amount1 from fmgre_finance_payment where in_acc_id = #{outAccId} and payment_time &lt;= #{paymentTime}) as t1
+                    ) as t2 ) -
+                (select COALESCE(t4.sum_payment_amount4,0) from 
+                    (select t3.sum_payment_amount3 as sum_payment_amount4 from
+                        (select sum(payment_amount) as sum_payment_amount3 from fmgre_finance_payment where out_acc_id = #{outAccId} and payment_time &lt;= #{paymentTime}) as t3
+                    ) as t4 ) - #{paymentAmount},</if>
+            <if test="inAccId != null and inAccId != 0">
+                (select COALESCE(t6.sum_payment_amount6,0) from 
+                    (select t5.sum_payment_amount5 as sum_payment_amount6 from
+                        (select sum(payment_amount) as sum_payment_amount5 from fmgre_finance_payment where in_acc_id = #{inAccId} and payment_time &lt;= #{paymentTime}) as t5
+                    ) as t6 ) -
+                (select COALESCE(t8.sum_payment_amount8,0) from 
+                    (select t7.sum_payment_amount7 as sum_payment_amount8 from
+                        (select sum(payment_amount) as sum_payment_amount7 from fmgre_finance_payment where out_acc_id = #{inAccId} and payment_time &lt;= #{paymentTime}) as t7
+                    ) as t8 ) + #{paymentAmount},</if>
+ 
          </trim>
     </insert>
 
@@ -76,11 +100,80 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="paymentComment != null">payment_comment = #{paymentComment},</if>
             <if test="paymentAmount != null">payment_amount = #{paymentAmount},</if>
             <if test="paymentTime != null">payment_time = #{paymentTime},</if>
-            <if test="outAccBanlance != null">out_acc_banlance = #{outAccBanlance},</if>
-            <if test="inAccBanlance != null">in_acc_banlance = #{inAccBanlance},</if>
+            <if test="outAccId != null and outAccId != 0">
+                out_acc_banlance = 
+                (select COALESCE(t2.sum_payment_amount2,0) from 
+                    (select t1.sum_payment_amount1 as sum_payment_amount2 from
+                        (select sum(payment_amount) as sum_payment_amount1 from fmgre_finance_payment where in_acc_id = #{outAccId} and (payment_time &lt; #{paymentTime} or (payment_time = #{paymentTime} and payment_id &lt; #{paymentId}))) as t1
+                    ) as t2 ) -
+                (select COALESCE(t4.sum_payment_amount4,0) from 
+                    (select t3.sum_payment_amount3 as sum_payment_amount4 from
+                        (select sum(payment_amount) as sum_payment_amount3 from fmgre_finance_payment where out_acc_id = #{outAccId} and (payment_time &lt; #{paymentTime} or (payment_time = #{paymentTime} and payment_id &lt; #{paymentId}))) as t3
+                    ) as t4 ) 
+                <if test="paymentAmount != null"> - #{paymentAmount}</if>
+                <if test="paymentAmount == null"> - (select o1.payment_amount from (select payment_amount from fmgre_finance_payment where payment_id = #{paymentId}) as o1)</if>
+            ,</if>
+            <if test="inAccId != null and inAccId != 0">
+                in_acc_banlance = 
+                (select COALESCE(t6.sum_payment_amount6,0) from 
+                    (select t5.sum_payment_amount5 as sum_payment_amount6 from
+                        (select sum(payment_amount) as sum_payment_amount5 from fmgre_finance_payment where in_acc_id = #{inAccId} and (payment_time &lt; #{paymentTime} or (payment_time = #{paymentTime} and payment_id &lt; #{paymentId}))) as t5
+                    ) as t6 ) -
+                (select COALESCE(t8.sum_payment_amount8,0) from 
+                    (select t7.sum_payment_amount7 as sum_payment_amount8 from
+                        (select sum(payment_amount) as sum_payment_amount7 from fmgre_finance_payment where out_acc_id = #{inAccId} and (payment_time &lt; #{paymentTime} or (payment_time = #{paymentTime} and payment_id &lt; #{paymentId}))) as t7
+                    ) as t8 ) 
+                <if test="paymentAmount != null"> + #{paymentAmount}</if>
+                <if test="paymentAmount == null"> + (select o2.payment_amount from (select payment_amount from fmgre_finance_payment where payment_id = #{paymentId}) as o2)</if>
+            ,</if>
         </trim>
         where payment_id = #{paymentId}
     </update>
+    
+    <update id="updateFmgreFinancePaymentBanlance" parameterType="FmgreFinancePayment">
+        update fmgre_finance_payment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="outAccId != null and outAccId != 0">
+                out_acc_banlance = 
+                (select COALESCE(t2.sum_payment_amount2,0) from 
+                    (select t1.sum_payment_amount1 as sum_payment_amount2 from
+                        (select sum(payment_amount) as sum_payment_amount1 from fmgre_finance_payment where in_acc_id = #{outAccId} and (payment_time &lt; #{paymentTime} or (payment_time = #{paymentTime} and payment_id &lt; #{paymentId}))) as t1
+                    ) as t2 ) -
+                (select COALESCE(t4.sum_payment_amount4,0) from 
+                    (select t3.sum_payment_amount3 as sum_payment_amount4 from
+                        (select sum(payment_amount) as sum_payment_amount3 from fmgre_finance_payment where out_acc_id = #{outAccId} and (payment_time &lt; #{paymentTime} or (payment_time = #{paymentTime} and payment_id &lt; #{paymentId}))) as t3
+                    ) as t4 ) - #{paymentAmount},</if>
+            <if test="inAccId != null and inAccId != 0">
+                in_acc_banlance = 
+                (select COALESCE(t6.sum_payment_amount6,0) from 
+                    (select t5.sum_payment_amount5 as sum_payment_amount6 from
+                        (select sum(payment_amount) as sum_payment_amount5 from fmgre_finance_payment where in_acc_id = #{inAccId} and (payment_time &lt; #{paymentTime} or (payment_time = #{paymentTime} and payment_id &lt; #{paymentId}))) as t5
+                    ) as t6 ) -
+                (select COALESCE(t8.sum_payment_amount8,0) from 
+                    (select t7.sum_payment_amount7 as sum_payment_amount8 from
+                        (select sum(payment_amount) as sum_payment_amount7 from fmgre_finance_payment where out_acc_id = #{inAccId} and (payment_time &lt; #{paymentTime} or (payment_time = #{paymentTime} and payment_id &lt; #{paymentId}))) as t7
+                    ) as t8 ) + #{paymentAmount},</if>
+        </trim>
+        where payment_id = #{paymentId}
+    </update>
+    
+    <update id="updateFmgreFinancePaymentBanlancesOutOutAcc" parameterType="FmgreFinancePayment">
+        update fmgre_finance_payment set out_acc_banlance = out_acc_banlance - #{paymentAmount} 
+        	where #{outAccId} &gt; 0 and out_acc_id = #{outAccId} and (payment_time &gt; #{paymentTime} or (payment_time = #{paymentTime} and payment_id &gt; #{paymentId}))
+	</update>
+    <update id="updateFmgreFinancePaymentBanlancesOutInAcc" parameterType="FmgreFinancePayment">
+        update fmgre_finance_payment set out_acc_banlance = out_acc_banlance + #{paymentAmount} 
+        	where #{inAccId} &gt; 0 and out_acc_id = #{inAccId} and (payment_time &gt; #{paymentTime} or (payment_time = #{paymentTime} and payment_id &gt; #{paymentId}))
+	</update>
+    <update id="updateFmgreFinancePaymentBanlancesInOutAcc" parameterType="FmgreFinancePayment">
+        update fmgre_finance_payment set in_acc_banlance = in_acc_banlance - #{paymentAmount} 
+        	where #{outAccId} &gt; 0 and in_acc_id = #{outAccId} and (payment_time &gt; #{paymentTime} or (payment_time = #{paymentTime} and payment_id &gt; #{paymentId}))
+	</update>
+    <update id="updateFmgreFinancePaymentBanlancesInInAcc" parameterType="FmgreFinancePayment">
+        update fmgre_finance_payment set in_acc_banlance = in_acc_banlance + #{paymentAmount} 
+        	where #{inAccId} &gt; 0 and in_acc_id = #{inAccId} and (payment_time &gt; #{paymentTime} or (payment_time = #{paymentTime} and payment_id &gt; #{paymentId}))
+	</update>
+
 
     <delete id="deleteFmgreFinancePaymentByPaymentId" parameterType="Long">
         delete from fmgre_finance_payment where payment_id = #{paymentId}

@@ -1,31 +1,35 @@
 package com.ruoyi.fmgr.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.fmgr.domain.FmgrePurchaseRequir;
-import com.ruoyi.fmgr.service.IFmgrePurchaseRequirService;
-import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.fmgr.domain.FmgrePurchaseItem;
-import com.ruoyi.fmgr.service.IFmgrePurchaseItemService;
-import java.util.stream.Collectors;
+import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.fmgr.domain.FmgreMaterial;
-import com.ruoyi.fmgr.service.IFmgreMaterialService;
+import com.ruoyi.fmgr.domain.FmgrePurchaseItem;
+import com.ruoyi.fmgr.domain.FmgrePurchaseRequir;
 import com.ruoyi.fmgr.domain.FmgrePurchaseRequirSummaryBo;
+import com.ruoyi.fmgr.service.IFmgreMaterialService;
+import com.ruoyi.fmgr.service.IFmgrePurchaseItemService;
+import com.ruoyi.fmgr.service.IFmgrePurchaseRequirService;
 
 /**
  * 采购需求Controller
@@ -51,6 +55,7 @@ public class FmgrePurchaseRequirController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('purchase:requir:list')")
     @GetMapping("/list")
+    @DataScope(deptAlias = "d")
     public TableDataInfo list(FmgrePurchaseRequir fmgrePurchaseRequir)
     {
         startPage();
@@ -67,6 +72,7 @@ public class FmgrePurchaseRequirController extends BaseController
 
     @PreAuthorize("@ss.hasPermi('purchase:requir:list')")
     @GetMapping("/listids")
+    @DataScope(deptAlias = "d")
     public TableDataInfo listByIds(Long[] requirIds)
     {
         startPage();
@@ -80,6 +86,7 @@ public class FmgrePurchaseRequirController extends BaseController
     @PreAuthorize("@ss.hasPermi('purchase:requir:export')")
     @Log(title = "采购需求", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
+    @DataScope(deptAlias = "d")
     public void export(HttpServletResponse response, FmgrePurchaseRequir fmgrePurchaseRequir)
     {
         List<FmgrePurchaseRequir> list = fmgrePurchaseRequirService.selectFmgrePurchaseRequirList(fmgrePurchaseRequir);
@@ -92,6 +99,7 @@ public class FmgrePurchaseRequirController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('purchase:requir:query')")
     @GetMapping(value = "/{requirId}")
+    @DataScope(deptAlias = "d")
     public AjaxResult getInfo(@PathVariable("requirId") Long requirId)
     {
         FmgrePurchaseRequir fmgrePurchaseRequir = fmgrePurchaseRequirService.selectFmgrePurchaseRequirByRequirId(requirId);

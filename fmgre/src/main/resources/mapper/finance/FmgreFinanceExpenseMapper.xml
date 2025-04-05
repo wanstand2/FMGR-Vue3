@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.fmgr.mapper.FmgreFinanceExpenseMapper">
+    
+    <resultMap type="FmgreFinanceExpense" id="FmgreFinanceExpenseResult">
+        <result property="expenseId"    column="expense_id"    />
+        <result property="expenseName"    column="expense_name"    />
+        <result property="expenseCode"    column="expense_code"    />
+        <result property="expenseTypeDictid"    column="expense_type_dictid"    />
+        <result property="expenseComment"    column="expense_comment"    />
+    </resultMap>
+
+    <sql id="selectFmgreFinanceExpenseVo">
+        select expense_id, expense_name, expense_code, expense_type_dictid, expense_comment from fmgre_finance_expense
+    </sql>
+
+    <select id="selectFmgreFinanceExpenseList" parameterType="FmgreFinanceExpense" resultMap="FmgreFinanceExpenseResult">
+        <include refid="selectFmgreFinanceExpenseVo"/>
+        <where>  
+            <if test="expenseId != null "> and expense_id = #{expenseId}</if>
+            <if test="expenseName != null  and expenseName != ''"> and expense_name like concat('%', #{expenseName}, '%')</if>
+            <if test="expenseCode != null  and expenseCode != ''"> and expense_code like concat('%', #{expenseCode}, '%')</if>
+            <if test="expenseTypeDictid != null  and expenseTypeDictid != ''"> and expense_type_dictid = #{expenseTypeDictid}</if>
+            <if test="expenseComment != null  and expenseComment != ''"> and expense_comment like concat('%', #{expenseComment}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectFmgreFinanceExpenseByExpenseId" parameterType="Long" resultMap="FmgreFinanceExpenseResult">
+        <include refid="selectFmgreFinanceExpenseVo"/>
+        where expense_id = #{expenseId}
+    </select>
+
+    <insert id="insertFmgreFinanceExpense" parameterType="FmgreFinanceExpense">
+        insert into fmgre_finance_expense
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="expenseId != null">expense_id,</if>
+            <if test="expenseName != null">expense_name,</if>
+            <if test="expenseCode != null">expense_code,</if>
+            <if test="expenseTypeDictid != null">expense_type_dictid,</if>
+            <if test="expenseComment != null">expense_comment,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="expenseId != null">#{expenseId},</if>
+            <if test="expenseName != null">#{expenseName},</if>
+            <if test="expenseCode != null">#{expenseCode},</if>
+            <if test="expenseTypeDictid != null">#{expenseTypeDictid},</if>
+            <if test="expenseComment != null">#{expenseComment},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFmgreFinanceExpense" parameterType="FmgreFinanceExpense">
+        update fmgre_finance_expense
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="expenseName != null">expense_name = #{expenseName},</if>
+            <if test="expenseCode != null">expenseCode = #{expenseCode},</if>
+            <if test="expenseTypeDictid != null">expense_type_dictid = #{expenseTypeDictid},</if>
+            <if test="expenseComment != null">expense_comment = #{expenseComment},</if>
+        </trim>
+        where expense_id = #{expenseId}
+    </update>
+
+    <delete id="deleteFmgreFinanceExpenseByExpenseId" parameterType="Long">
+        delete from fmgre_finance_expense where expense_id = #{expenseId}
+    </delete>
+
+    <delete id="deleteFmgreFinanceExpenseByExpenseIds" parameterType="String">
+        delete from fmgre_finance_expense where expense_id in 
+        <foreach item="expenseId" collection="array" open="(" separator="," close=")">
+            #{expenseId}
+        </foreach>
+    </delete>
+</mapper>

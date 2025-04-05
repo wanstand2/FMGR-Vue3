@@ -1,14 +1,14 @@
 package com.fmger.utils;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Date;
-
-import org.apache.poi.ss.formula.functions.T;
+import java.util.List;
 
 public class CSVImport<T> {
 
@@ -84,4 +84,25 @@ public class CSVImport<T> {
 		throw new RuntimeException(e);
 	}
 	}
+	
+	public static IConvert<LocalDate> localDate1 = new IConvert<LocalDate>() {
+
+		@Override
+		public LocalDate conv(String s) {
+			return LocalDate.parse(s, DateTimeFormatter.ofPattern("yyyy年M月d日"));
+		}
+			
+	};
+	
+	public static IConvert<LocalTime> localTime1 = new IConvert<LocalTime>() {
+
+		@Override
+		public LocalTime conv(String s) {
+			if(s == null || s.length() == 0) return null;
+//			String[] ss = s.split(":");
+//			return LocalTime.of(0, 0)；
+			return LocalTime.parse(s, DateTimeFormatter.ofPattern("H:mm"));
+		}
+			
+	};
 }

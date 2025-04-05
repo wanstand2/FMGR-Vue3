@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.fmgr.mapper.FmgreFinanceExpensesPayMapper">
+    
+    <resultMap type="FmgreFinanceExpensesPay" id="FmgreFinanceExpensesPayResult">
+        <result property="expenseId"    column="expense_id"    />
+        <result property="paymentId"    column="payment_id"    />
+        <result property="payId"    column="pay_id"    />
+        <result property="priceId"    column="price_id"    />
+        <result property="payAmount"    column="pay_amount"    />
+        <result property="paySubtotal"    column="pay_subtotal"    />
+        <result property="payName"    column="pay_name"    />
+        <result property="payComment"    column="pay_comment"    />
+    </resultMap>
+
+    <resultMap type="FmgreFinanceExpensesPayBo" id="FmgreFinanceExpensesPayBoResult">
+        <result property="expenseId"    column="expense_id"    />
+        <result property="paymentId"    column="payment_id"    />
+        <result property="payId"    column="pay_id"    />
+        <result property="priceId"    column="price_id"    />
+        <result property="payAmount"    column="pay_amount"    />
+        <result property="paySubtotal"    column="pay_subtotal"    />
+        <result property="payName"    column="pay_name"    />
+        <result property="payComment"    column="pay_comment"    />
+        <result property="accountId"    column="out_acc_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="payTime"    column="payment_time"    />
+    </resultMap>
+
+    <sql id="selectFmgreFinanceExpensesPayVo">
+        select expense_id, payment_id, pay_id, price_id, pay_amount, pay_subtotal, pay_name, pay_comment from fmgre_finance_expenses_pay
+    </sql>
+
+    <sql id="selectFmgreFinanceExpensesPayDisplayVo">
+        select expense_id, e.payment_id, pay_id, price_id, pay_amount, pay_subtotal, pay_name, pay_comment, p.out_acc_id, p.user_id, p.payment_time
+        from fmgre_finance_expenses_pay e left join fmgre_finance_payment as p on e.payment_id = p.payment_id
+    </sql>
+
+    <select id="selectFmgreFinanceExpensesPayList" parameterType="FmgreFinanceExpensesPay" resultMap="FmgreFinanceExpensesPayBoResult">
+        <include refid="selectFmgreFinanceExpensesPayDisplayVo"/>
+        <where>  
+            <if test="expenseId != null "> and expense_id = #{expenseId}</if>
+            <if test="paymentId != null "> and payment_id = #{paymentId}</if>
+            <if test="priceId != null "> and price_id = #{priceId}</if>
+            <if test="payAmount != null "> and pay_amount = #{payAmount}</if>
+            <if test="paySubtotal != null "> and pay_subtotal = #{paySubtotal}</if>
+            <if test="payName != null  and payName != ''"> and pay_name like concat('%', #{payName}, '%')</if>
+            <if test="payComment != null  and payComment != ''"> and pay_comment = #{payComment}</if>
+        </where>
+    </select>
+    
+    <select id="selectFmgreFinanceExpensesPayByPayId" parameterType="Long" resultMap="FmgreFinanceExpensesPayBoResult">
+        <include refid="selectFmgreFinanceExpensesPayDisplayVo"/>
+        where pay_id = #{pay_id}
+    </select>
+
+    <insert id="insertFmgreFinanceExpensesPay" parameterType="FmgreFinanceExpensesPay">
+	    <selectKey keyProperty="payId" order="AFTER" resultType="java.lang.Long">
+          SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into fmgre_finance_expenses_pay
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="expenseId != null">expense_id,</if>
+            <if test="paymentId != null">payment_id,</if>
+            <if test="priceId != null">price_id,</if>
+            <if test="payAmount != null">pay_amount,</if>
+            <if test="paySubtotal != null">pay_subtotal,</if>
+            <if test="payName != null">pay_name,</if>
+            <if test="payComment != null">pay_comment,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="expenseId != null">#{expenseId},</if>
+            <if test="paymentId != null">#{paymentId},</if>
+            <if test="priceId != null">#{priceId},</if>
+            <if test="payAmount != null">#{payAmount},</if>
+            <if test="paySubtotal != null">#{paySubtotal},</if>
+            <if test="payName != null">#{payName},</if>
+            <if test="payComment != null">#{payComment},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFmgreFinanceExpensesPay" parameterType="FmgreFinanceExpensesPay">
+        update fmgre_finance_expenses_pay
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="paymentId != null">payment_id = #{paymentId},</if>
+            <if test="expenseId != null">expense_id = #{expenseId},</if>
+            <if test="priceId != null">price_id = #{priceId},</if>
+            <if test="payAmount != null">pay_amount = #{payAmount},</if>
+            <if test="paySubtotal != null">pay_subtotal = #{paySubtotal},</if>
+            <if test="payName != null">pay_name = #{payName},</if>
+            <if test="payComment != null">pay_comment = #{payComment},</if>
+        </trim>
+        where pay_id = #{payId}
+    </update>
+
+    <delete id="deleteFmgreFinanceExpensesPayByPayId" parameterType="Long">
+        delete from fmgre_finance_expenses_pay where pay_id = #{payId}
+    </delete>
+
+    <delete id="deleteFmgreFinanceExpensesPayByPayIds" parameterType="String">
+        delete from fmgre_finance_expenses_pay where pay_id in 
+        <foreach item="payId" collection="array" open="(" separator="," close=")">
+            #{payId}
+        </foreach>
+    </delete>
+</mapper>

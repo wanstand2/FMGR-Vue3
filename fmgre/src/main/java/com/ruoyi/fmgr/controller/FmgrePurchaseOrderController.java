@@ -26,6 +26,7 @@ import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.fmgr.domain.FmgrePurchaseItem;
 import com.ruoyi.fmgr.service.IFmgrePurchaseItemService;
+import com.ruoyi.fmgr.domain.FmgreFinancePayment;
 import com.ruoyi.fmgr.domain.FmgreFinancePaymentDisplayBo;
 import com.ruoyi.fmgr.service.IFmgreFinancePaymentService;
 import com.ruoyi.fmgr.domain.FmgreSupplierQuote;
@@ -42,6 +43,8 @@ import com.ruoyi.fmgr.service.IFmgreMaterialService;
 import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.fmgr.domain.FmgrePurchaseOrderSummaryBo;
 import com.ruoyi.fmgr.domain.FmgreFinancePaymentPayBo;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -163,7 +166,8 @@ public class FmgrePurchaseOrderController extends BaseController
     @Transactional(rollbackFor = Exception.class)
     public AjaxResult submit(@RequestBody FmgrePurchaseOrderSubmitBo fmgrePurchaseOrderSubmitBo)
     {
-        if(fmgrePurchaseOrderSubmitBo.getItems() == null || fmgrePurchaseOrderSubmitBo.getItems().isEmpty()) {
+        if((fmgrePurchaseOrderSubmitBo.getOrderId() == null || fmgrePurchaseOrderSubmitBo.getOrderId() == 0)
+        		&& (fmgrePurchaseOrderSubmitBo.getItems() == null || fmgrePurchaseOrderSubmitBo.getItems().isEmpty())) {
             return toAjax(0);
         }
         System.out.println("ordercode=" + fmgrePurchaseOrderSubmitBo.getOrderCode());
@@ -182,6 +186,9 @@ public class FmgrePurchaseOrderController extends BaseController
             fmgrePurchaseOrderSubmitBo.setSupplierId(fmgrePurchaseOrderSubmitBo.getItems().get(0).getSupplierId());
             fmgrePurchaseOrderService.insertFmgrePurchaseOrder(fmgrePurchaseOrderSubmitBo);
         } else {
+            if(fmgrePurchaseOrderSubmitBo.getItems() == null) {
+            	fmgrePurchaseOrderSubmitBo.setItems(new ArrayList<>());
+            }
             FmgrePurchaseItem selectFmgrePurchaseItem = new FmgrePurchaseItem();
             selectFmgrePurchaseItem.setOrderId(fmgrePurchaseOrderSubmitBo.getOrderId());
             List<FmgrePurchaseItem> fmgrePurchaseItems = fmgrePurchaseItemService.selectFmgrePurchaseItemList(selectFmgrePurchaseItem);
@@ -191,6 +198,13 @@ public class FmgrePurchaseOrderController extends BaseController
                 .map(FmgrePurchaseItem::getItemTotalPrice).reduce(totalPrice, BigDecimal::add);
             fmgrePurchaseOrderSubmitBo.setOrderTotalPrice(totalPrice);
             fmgrePurchaseOrderService.updateFmgrePurchaseOrder(fmgrePurchaseOrderSubmitBo);
+            FmgrePurchaseOrder old = fmgrePurchaseOrderService.selectFmgrePurchaseOrderByOrderId(fmgrePurchaseOrderSubmitBo.getOrderId());
+            if(fmgrePurchaseOrderSubmitBo.getOrderTime() == null) {
+            	fmgrePurchaseOrderSubmitBo.setOrderTime(old.getOrderTime());
+            }
+            if(fmgrePurchaseOrderSubmitBo.getPaymentId() == null || fmgrePurchaseOrderSubmitBo.getPaymentId() == 0) {
+            	fmgrePurchaseOrderSubmitBo.setPaymentId(old.getPaymentId());
+            }
         }
         Date orderTime = fmgrePurchaseOrderSubmitBo.getOrderTime();
         if(orderTime == null) {
@@ -237,7 +251,16 @@ public class FmgrePurchaseOrderController extends BaseController
             qorder.setOrderTotalPrice(orderTotalPrice);
             fmgrePurchaseOrderService.updateFmgrePurchaseOrder(qorder);
         }
-        if(fmgrePurchaseOrderSubmitBo.getAccountId() != null && fmgrePurchaseOrderSubmitBo.getAccountId() != 0) {
+        if(fmgrePurchaseOrderSubmitBo.getPaymentId() != null && fmgrePurchaseOrderSubmitBo.getPaymentId() != 0) {
+            FmgreFinancePayment old = fmgreFinancePaymentService.selectFmgreFinancePaymentByPaymentId(fmgrePurchaseOrderSubmitBo.getPaymentId());
+            FmgreFinancePayment payment = new FmgreFinancePayment();
+            payment.setPaymentId(old.getPaymentId());
+            payment.setInAccId(old.getInAccId());
+            payment.setOutAccId(old.getOutAccId());
+            payment.setPaymentAmount(orderTotalPrice);
+            payment.setPaymentTime(fmgrePurchaseOrderSubmitBo.getOrderTime());
+            fmgreFinancePaymentService.updateFmgreFinancePayment(payment);
+        } else if(fmgrePurchaseOrderSubmitBo.getAccountId() != null && fmgrePurchaseOrderSubmitBo.getAccountId() != 0) {
             FmgreFinancePaymentPayBo payBo = new FmgreFinancePaymentPayBo();
             payBo.setOrderIds(Arrays.asList(fmgrePurchaseOrderSubmitBo.getOrderId()));
             payBo.setAccountId(fmgrePurchaseOrderSubmitBo.getAccountId());

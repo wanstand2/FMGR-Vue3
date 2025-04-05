@@ -2,7 +2,7 @@ package com.ruoyi.fmgr.service;
 
 import java.util.List;
 import java.util.Collection;
-
+import java.util.Date;
 import com.ruoyi.fmgr.domain.FmgrePurchaseItem;
 import com.ruoyi.fmgr.domain.FmgrePurchaseRequirSummaryBo;
 import com.ruoyi.fmgr.domain.FmgrePurchaseOrderSummaryBo;
@@ -25,6 +25,7 @@ public interface IFmgrePurchaseItemService
     public List<FmgrePurchaseItem> selectFmgrePurchaseItemByItemIds(Collection<Long> itemIds);
     public List<FmgrePurchaseRequirSummaryBo> selectFmgrePurchaseRequirSummaryByRequirIds(Collection<Long> requirIds);
     public List<FmgrePurchaseOrderSummaryBo> selectFmgrePurchaseOrderSummaryByOrderIds(Collection<Long> orderIds);
+    public List<FmgrePurchaseItem> selectFmgrePurchaseMaterialLastSupplier(Collection<Long> materialId, Long deptId, Date orderTime);
     /**
      * 查询采购记录列表
      * 

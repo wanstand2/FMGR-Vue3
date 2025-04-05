@@ -16,13 +16,14 @@ import org.htmlunit.HttpMethod;
 import com.fmger.http.WebRequestVo;
 import com.fmger.http.site.ruoyi.vo.RyAjaxResult;
 import com.fmger.http.site.ruoyi.vo.RyTableDataInfo;
-import com.fmger.http.site.ruoyi.vo.fmgre.SupplierQuote;
 import com.fmger.utils.IConvert;
 import com.google.gson.reflect.TypeToken;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.fmgr.domain.FmgreFinanceAccount;
 import com.ruoyi.fmgr.domain.FmgreFinancePayment;
 import com.ruoyi.fmgr.domain.FmgreFinancePaymentPayBo;
+import com.ruoyi.fmgr.domain.FmgreHrEmployee;
+import com.ruoyi.fmgr.domain.FmgreHrEmployeePunch;
 import com.ruoyi.fmgr.domain.FmgreMaterial;
 import com.ruoyi.fmgr.domain.FmgrePurchaseItem;
 import com.ruoyi.fmgr.domain.FmgrePurchaseOrder;
@@ -41,7 +42,7 @@ public class 	SiteRuoyiFast {
 		return _site;
 	}
 	private static <T> T commit(WebRequestVo rvo, Type type) {
-		rvo.setUrl("/dev-api"+rvo.url);
+		rvo.setUrl("/" + _get().getApi() + rvo.url);
 		if(rvo.method.equals(HttpMethod.GET) && rvo.querys.get("pageSize") == null) {
 			rvo.querys.put("pageSize", 10000);
 		}
@@ -229,6 +230,16 @@ public class 	SiteRuoyiFast {
 		RyAjaxResult<Integer> r = commit(ro, new TypeToken<RyAjaxResult<Integer>>() {}.getType());
 		return r.getData();	
 	}	
+	
+	public Integer insertHrEmployeePunch(FmgreHrEmployeePunch ep) {
+		WebRequestVo ro = 
+				new WebRequestVo(
+						"/hr/punch", HttpMethod.POST)
+				.asJsonRequest()
+				.setPayload(ep);
+		RyAjaxResult<Integer> r = commit(ro, new TypeToken<RyAjaxResult<Integer>>() {}.getType());
+		return r.getData();	
+	}
 
 	public Integer submitPurchaseOrder(FmgrePurchaseOrderSubmitBo order) {
 		WebRequestVo ro = 
@@ -306,4 +317,23 @@ public class 	SiteRuoyiFast {
 		RyAjaxResult<Integer> r = commit(ro, new TypeToken<RyAjaxResult<Integer>>() {}.getType());
 		return r.getData();
 	}
+	
+	public Integer refreshPayment(Long paymentId) {
+		WebRequestVo ro = 
+				new WebRequestVo(
+						"/finance/payment/refresh/" + paymentId, HttpMethod.GET)
+				.asJsonRequest();
+		RyAjaxResult<Integer> r = commit(ro, new TypeToken<RyAjaxResult<Integer>>() {}.getType());
+		return r.getData();
+	}
+
+	public RyTableDataInfo<FmgreHrEmployee> listEmployees(Map<String, Object> querys) {
+		WebRequestVo ro = 
+				new WebRequestVo(
+						"/hr/employee/list", HttpMethod.GET)
+				.asJsonRequest()
+				.setQuerys(querys);
+		return commit(ro, new TypeToken<RyTableDataInfo<FmgreHrEmployee>>() {}.getType());
+	}
+	
 }

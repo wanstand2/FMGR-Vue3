@@ -68,7 +68,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
     
     <select id="getOrdersTotalPrice" parameterType="java.util.Collection" resultType="BigDecimal">
-        select sum(order_total_price) from fmgre_purchase_order where order_id in
+        select sum(item_total_price) from fmgre_purchase_item where order_id in
         <foreach item="orderId" collection="orderIds" open="(" separator="," close=")">
             #{orderId}
         </foreach>
@@ -115,7 +115,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <trim prefix="SET" suffixOverrides=",">
             <if test="userId != null">user_id = #{userId},</if>
             <if test="supplierId != null">supplier_id = #{supplierId},</if>
-            <if test="orderCode != null">materail_code = #{orderCode},</if>
+            <if test="orderCode != null">order_code = #{orderCode},</if>
             <if test="deliveryDictid != null">delivery_dictid = #{deliveryDictid},</if>
             <if test="orderTime != null">order_time = #{orderTime},</if>
             <if test="orderTotalPrice != null">order_total_price = #{orderTotalPrice},</if>

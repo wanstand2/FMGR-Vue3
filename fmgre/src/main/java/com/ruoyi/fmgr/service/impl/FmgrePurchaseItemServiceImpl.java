@@ -2,6 +2,7 @@ package com.ruoyi.fmgr.service.impl;
 
 import java.util.List;
 import java.util.Collection;
+import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.fmgr.mapper.FmgrePurchaseItemMapper;
@@ -110,6 +111,17 @@ public class FmgrePurchaseItemServiceImpl implements IFmgrePurchaseItemService
     public List<FmgrePurchaseOrderSummaryBo> selectFmgrePurchaseOrderSummaryByOrderIds(Collection<Long> orderIds)
     {
         return fmgrePurchaseItemMapper.selectFmgrePurchaseOrderSummaryByOrderIds(orderIds);
+    }
+
+    @Override
+    public List<FmgrePurchaseItem> selectFmgrePurchaseMaterialLastSupplier(Collection<Long> materialId, Long deptId, Date orderTime)
+    {
+        List<FmgrePurchaseItem> items = fmgrePurchaseItemMapper.selectFmgrePurchaseMaterialLastSupplier(materialId, deptId, orderTime);
+        items.forEach(item -> {
+            item.setMaterail(null);
+            item.setQuote(null);
+        });
+        return items;
     }
 
     @Override

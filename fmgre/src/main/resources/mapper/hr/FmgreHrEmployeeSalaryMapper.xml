@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.fmgr.mapper.FmgreHrEmployeeSalaryMapper">
+    
+    <resultMap type="FmgreHrEmployeeSalary" id="FmgreHrEmployeeSalaryResult">
+        <result property="employeeId"    column="employee_id"    />
+        <result property="salaryTypeDictid"    column="salary_type_dictid"    />
+        <result property="salaryAmount"    column="salary_amount"    />
+        <result property="salaryComment"    column="salary_comment"    />
+    </resultMap>
+
+    <sql id="selectFmgreHrEmployeeSalaryVo">
+        select employee_id, salary_type_dictid, salary_amount, salary_comment from fmgre_hr_employee_salary
+    </sql>
+
+    <select id="selectFmgreHrEmployeeSalaryList" parameterType="FmgreHrEmployeeSalary" resultMap="FmgreHrEmployeeSalaryResult">
+        <include refid="selectFmgreHrEmployeeSalaryVo"/>
+        <where>  
+            <if test="employeeId != null "> and employee_id = #{employeeId}</if>
+            <if test="salaryTypeDictid != null  and salaryTypeDictid != ''"> and salary_type_dictid = #{salaryTypeDictid}</if>
+            <if test="salaryAmount != null "> and salary_amount = #{salaryAmount}</if>
+            <if test="salaryComment != null  and salaryComment != ''"> and salary_comment like concat('%', #{salaryComment}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectFmgreHrEmployeeSalaryByEmployeeId" parameterType="Long" resultMap="FmgreHrEmployeeSalaryResult">
+        <include refid="selectFmgreHrEmployeeSalaryVo"/>
+        where employee_id = #{employeeId}
+    </select>
+    
+    <select id="selectFmgreHrEmployeeSalaryListByIds" parameterType="java.util.Collection" resultMap="FmgreHrEmployeeSalaryResult">
+        <include refid="selectFmgreHrEmployeeSalaryVo"/>
+        where 0
+        <if test="collection != null and collection.size() > 0">
+            or employee_id in
+            <foreach item="employeeId" collection="list" open="(" separator="," close=")">
+                #{employeeId}
+            </foreach>
+        </if>
+    </select>
+
+    <insert id="insertFmgreHrEmployeeSalary" parameterType="FmgreHrEmployeeSalary">
+        insert into fmgre_hr_employee_salary
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="employeeId != null">employee_id,</if>
+            <if test="salaryTypeDictid != null">salary_type_dictid,</if>
+            <if test="salaryAmount != null">salary_amount,</if>
+            <if test="salaryComment != null">salary_comment,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="employeeId != null">#{employeeId},</if>
+            <if test="salaryTypeDictid != null">#{salaryTypeDictid},</if>
+            <if test="salaryAmount != null">#{salaryAmount},</if>
+            <if test="salaryComment != null">#{salaryComment},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFmgreHrEmployeeSalary" parameterType="FmgreHrEmployeeSalary">
+        update fmgre_hr_employee_salary
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="salaryTypeDictid != null">salary_type_dictid = #{salaryTypeDictid},</if>
+            <if test="salaryAmount != null">salary_amount = #{salaryAmount},</if>
+            <if test="salaryComment != null">salary_comment = #{salaryComment},</if>
+        </trim>
+        where employee_id = #{employeeId}
+    </update>
+
+    <delete id="deleteFmgreHrEmployeeSalaryByEmployeeId" parameterType="Long">
+        delete from fmgre_hr_employee_salary where employee_id = #{employeeId}
+    </delete>
+
+    <delete id="deleteFmgreHrEmployeeSalaryByEmployeeIds" parameterType="String">
+        delete from fmgre_hr_employee_salary where employee_id in 
+        <foreach item="employeeId" collection="array" open="(" separator="," close=")">
+            #{employeeId}
+        </foreach>
+    </delete>
+</mapper>

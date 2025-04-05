@@ -1,6 +1,9 @@
 package com.ruoyi.fmgr.controller;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Collection;
+import java.util.Date;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.annotation.Log;
@@ -46,6 +50,13 @@ public class FmgrePurchaseItemController extends BaseController
         return getDataTable(list);
     }
 
+    @PreAuthorize("@ss.hasPermi('purchase:item:list')")
+    @GetMapping("/mls")
+    public TableDataInfo materialLastSupplier(@RequestParam("materialId") Long[] materialId, @RequestParam("deptId") Long deptId, @RequestParam("orderTime") Date orderTime)
+    {
+        List<FmgrePurchaseItem> list = fmgrePurchaseItemService.selectFmgrePurchaseMaterialLastSupplier(Arrays.asList(materialId), deptId, orderTime);
+        return getDataTable(list);
+    }
     /**
      * 导出采购记录列表
      */

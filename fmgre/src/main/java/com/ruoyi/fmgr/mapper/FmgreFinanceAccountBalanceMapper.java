@@ -2,6 +2,7 @@ package com.ruoyi.fmgr.mapper;
 
 import java.util.List;
 import java.util.Collection;
+import org.apache.ibatis.annotations.Param;
 import com.ruoyi.fmgr.domain.FmgreFinanceAccountBalance;
 
 /**

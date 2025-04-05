@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.fmgr.mapper.FmgreFinanceExpensePriceMapper">
+    
+    <resultMap type="FmgreFinanceExpensePrice" id="FmgreFinanceExpensePriceResult">
+        <result property="priceId"    column="price_id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="expenseId"    column="expense_id"    />
+        <result property="priceName"    column="price_name"    />
+        <result property="pricePrice"    column="price_price"    />
+        <result property="priceComment"    column="price_comment"    />
+        <result property="priceTime"    column="price_time"    />
+    </resultMap>
+
+    <sql id="selectFmgreFinanceExpensePriceVo">
+        select price_id, dept_id, expense_id, price_name, price_price, price_comment, price_time from fmgre_finance_expense_price
+    </sql>
+
+    <select id="selectFmgreFinanceExpensePriceList" parameterType="FmgreFinanceExpensePrice" resultMap="FmgreFinanceExpensePriceResult">
+        <include refid="selectFmgreFinanceExpensePriceVo"/>
+        <where>  
+            <if test="priceId != null "> and price_id = #{priceId}</if>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="expenseId != null "> and expense_id = #{expenseId}</if>
+            <if test="priceName != null  and priceName != ''"> and price_name like concat('%', #{priceName}, '%')</if>
+            <if test="pricePrice != null "> and price_price = #{pricePrice}</if>
+            <if test="priceComment != null  and priceComment != ''"> and price_comment like concat('%', #{priceComment}, '%')</if>
+            <if test="params.beginPriceTime != null and params.beginPriceTime != '' and params.endPriceTime != null and params.endPriceTime != ''"> and price_time between #{params.beginPriceTime} and #{params.endPriceTime}</if>
+        </where>
+		${params.dataScope}
+    </select>
+    
+    <select id="selectFmgreFinanceExpensePriceByPriceId" parameterType="Long" resultMap="FmgreFinanceExpensePriceResult">
+        <include refid="selectFmgreFinanceExpensePriceVo"/>
+        where price_id = #{priceId}
+		${params.dataScope}
+    </select>
+
+    <insert id="insertFmgreFinanceExpensePrice" parameterType="FmgreFinanceExpensePrice">
+        insert into fmgre_finance_expense_price
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="priceId != null">price_id,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="expenseId != null">expense_id,</if>
+            <if test="priceName != null">price_name,</if>
+            <if test="pricePrice != null">price_price,</if>
+            <if test="priceComment != null">price_comment,</if>
+            <if test="priceTime != null">price_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="priceId != null">#{priceId},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="expenseId != null">#{expenseId},</if>
+            <if test="priceName != null">#{priceName},</if>
+            <if test="pricePrice != null">#{pricePrice},</if>
+            <if test="priceComment != null">#{priceComment},</if>
+            <if test="priceTime != null">#{priceTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFmgreFinanceExpensePrice" parameterType="FmgreFinanceExpensePrice">
+        update fmgre_finance_expense_price
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="expenseId != null">expense_id = #{expenseId},</if>
+            <if test="priceName != null">price_name = #{priceName},</if>
+            <if test="pricePrice != null">price_price = #{pricePrice},</if>
+            <if test="priceComment != null">price_comment = #{priceComment},</if>
+            <if test="priceTime != null">price_time = #{priceTime},</if>
+        </trim>
+        where price_id = #{priceId}
+    </update>
+
+    <delete id="deleteFmgreFinanceExpensePriceByPriceId" parameterType="Long">
+        delete from fmgre_finance_expense_price where price_id = #{priceId}
+    </delete>
+
+    <delete id="deleteFmgreFinanceExpensePriceByPriceIds" parameterType="String">
+        delete from fmgre_finance_expense_price where price_id in 
+        <foreach item="priceId" collection="array" open="(" separator="," close=")">
+            #{priceId}
+        </foreach>
+    </delete>
+</mapper>

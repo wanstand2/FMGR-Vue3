@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.fmgr.mapper.FmgreHrEmployeeSalaryPayMapper">
+    
+    <resultMap type="FmgreHrEmployeeSalaryPay" id="FmgreHrEmployeeSalaryPayResult">
+        <result property="payId"    column="pay_id"    />
+        <result property="paymentId"    column="payment_id"    />
+        <result property="employeeId"    column="employee_id"    />
+        <result property="payTime"    column="pay_time"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="payName"    column="pay_name"    />
+        <result property="payComment"    column="pay_comment"    />
+        <result property="pieriodWorkDay"    column="pieriod_work_day"    />
+        <result property="employeeWorkTime"    column="	employee_work_time"    />
+        <result property="timeSalary"    column="time_salary"    />
+        <result property="adjustSalary"    column="adjust_salary"    />
+    </resultMap>
+
+    <sql id="selectFmgreHrEmployeeSalaryPayVo">
+        select pay_id, payment_id, employee_id, pay_time, start_time, end_time, pay_name, pay_comment, pieriod_work_day, employee_work_time, time_salary, adjust_salary from fmgre_hr_employee_salary_pay
+    </sql>
+
+    <select id="selectFmgreHrEmployeeSalaryPayList" parameterType="FmgreHrEmployeeSalaryPay" resultMap="FmgreHrEmployeeSalaryPayResult">
+        <include refid="selectFmgreHrEmployeeSalaryPayVo"/>
+        <where>  
+            <if test="payId != null "> and pay_id = #{payId}</if>
+            <if test="paymentId != null "> and payment_id = #{paymentId}</if>
+            <if test="employeeId != null "> and employee_id = #{employeeId}</if>
+            <if test="payTime != null "> and pay_time = #{payTime}</if>
+            <if test="startTime != null "> and start_time = #{startTime}</if>
+            <if test="endTime != null "> and end_time = #{endTime}</if>
+            <if test="payName != null  and payName != ''"> and pay_name like concat('%', #{payName}, '%')</if>
+            <if test="payComment != null  and payComment != ''"> and pay_comment like concat('%', #{payComment}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectFmgreHrEmployeeSalaryPayByEDS" parameterType="map" resultMap="FmgreHrEmployeeSalaryPayResult">
+        <include refid="selectFmgreHrEmployeeSalaryPayVo"/>
+        where 
+        employee_id in
+            <foreach item="employeeId" collection="employeeIds" open="(" separator="," close=")">
+                #{employeeId}
+            </foreach>
+        and start_time in 
+            <foreach item="date" collection="dates" open="(" separator="," close=")">
+                #{date}
+            </foreach>
+    </select>
+    
+    <select id="selectFmgreHrEmployeeSalaryPayByPayId" parameterType="Long" resultMap="FmgreHrEmployeeSalaryPayResult">
+        <include refid="selectFmgreHrEmployeeSalaryPayVo"/>
+        where pay_id = #{payId}
+    </select>
+
+    <insert id="insertFmgreHrEmployeeSalaryPay" parameterType="FmgreHrEmployeeSalaryPay">
+        insert into fmgre_hr_employee_salary_pay
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="payId != null">pay_id,</if>
+            <if test="paymentId != null">payment_id,</if>
+            <if test="employeeId != null">employee_id,</if>
+            <if test="payTime != null">pay_time,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="payName != null">pay_name,</if>
+            <if test="payComment != null">pay_comment,</if>
+            <if test="pieriodWorkDay != null">pieriod_work_day,</if>
+            <if test="employeeWorkTime != null">employee_work_time,</if>
+            <if test="timeSalary != null">time_salary,</if>
+            <if test="adjustSalary != null">adjust_salary,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="payId != null">#{payId},</if>
+            <if test="paymentId != null">#{paymentId},</if>
+            <if test="employeeId != null">#{employeeId},</if>
+            <if test="payTime != null">#{payTime},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="payName != null">#{payName},</if>
+            <if test="payComment != null">#{payComment},</if>
+            <if test="pieriodWorkDay != null">#{pieriodWorkDay},</if>
+            <if test="employeeWorkTime != null">#{employeeWorkTime},</if>
+            <if test="timeSalary != null">#{timeSalary},</if>
+            <if test="adjustSalary != null">#{adjustSalary},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFmgreHrEmployeeSalaryPay" parameterType="FmgreHrEmployeeSalaryPay">
+        update fmgre_hr_employee_salary_pay
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="paymentId != null">payment_id = #{paymentId},</if>
+            <if test="employeeId != null">employee_id = #{employeeId},</if>
+            <if test="payTime != null">pay_time = #{payTime},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="payName != null">pay_name = #{payName},</if>
+            <if test="payComment != null">pay_comment = #{payComment},</if>
+            <if test="payComment != null">pieriod_work_day = #{pieriodWorkDay},</if>
+            <if test="payComment != null">employee_work_time = #{employeeWorkTime},</if>
+            <if test="payComment != null">time_salary = #{timeSalary},</if>
+            <if test="payComment != null">adjust_salary = #{adjustSalary},</if>
+        </trim>
+        where pay_id = #{payId}
+    </update>
+
+    <delete id="deleteFmgreHrEmployeeSalaryPayByPayId" parameterType="Long">
+        delete from fmgre_hr_employee_salary_pay where pay_id = #{payId}
+    </delete>
+
+    <delete id="deleteFmgreHrEmployeeSalaryPayByPayIds" parameterType="String">
+        delete from fmgre_hr_employee_salary_pay where pay_id in 
+        <foreach item="payId" collection="array" open="(" separator="," close=")">
+            #{payId}
+        </foreach>
+    </delete>
+</mapper>

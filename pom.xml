@@ -223,12 +223,6 @@
                 <artifactId>fmgre</artifactId>
                 <version>0.0.1</version>
             </dependency>
-            
-	    	<dependency>
-	    		<groupId>com.ruoyi</groupId>
-	    		<artifactId>fmgre-commiter</artifactId>
-	    		<version>0.0.1</version>
-	    	</dependency>
 
         </dependencies>
     </dependencyManagement>

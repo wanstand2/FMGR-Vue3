@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.fmgr.mapper.FmgreHrEmployeePunchMapper">
+    
+    <resultMap type="FmgreHrEmployeePunch" id="FmgreHrEmployeePunchResult">
+        <result property="punchId"    column="punch_id"    />
+        <result property="employeeId"    column="employee_id"    />
+        <result property="punchInTime"    column="punch_in_time"    />
+        <result property="punchOutTime"    column="punch_out_time"    />
+        <result property="workDuration"    column="work_duration"    />
+        <result property="punchTypeDictid"    column="punch_type_dictid"    />
+        <result property="punchComment"    column="punch_comment"    />
+    </resultMap>
+
+    <resultMap type="com.ruoyi.fmgr.domain.FmgreHrEmployeeSalaryPayCalcBo$PunchSummay" id = "FmgreHrEmployeePunchSummaryResult">
+        <result property="sumTime"    column="work_duration_sum"    />
+        <result property="date"    column="punch_date"    />
+        <result property="minTime"    column="min_time"    />
+        <result property="maxTime"    column="max_time"    />
+        <result property="punchTimes"    column="punch_count"    />
+    </resultMap>
+
+    <sql id="selectFmgreHrEmployeePunchVo">
+        select punch_id, employee_id, punch_in_time, punch_out_time, work_duration, punch_type_dictid, punch_comment from fmgre_hr_employee_punch
+    </sql>
+
+    <select id="selectFmgreHrEmployeePunchList" parameterType="FmgreHrEmployeePunch" resultMap="FmgreHrEmployeePunchResult">
+        <include refid="selectFmgreHrEmployeePunchVo"/>
+        <where>  
+            <if test="punchId != null "> and punch_id = #{punchId}</if>
+            <if test="employeeId != null "> and employee_id = #{employeeId}</if>
+            <if test="punchInTime != null "> and punch_in_time = #{punchInTime}</if>
+            <if test="punchOutTime != null "> and punch_out_time = #{punchOutTime}</if>
+            <if test="workDuration != null "> and work_duration = #{workDuration}</if>
+            <if test="punchTypeDictid != null  and punchTypeDictid != ''"> and punch_type_dictid = #{punchTypeDictid}</if>
+            <if test="punchComment != null  and punchComment != ''"> and punch_comment like concat('%', #{punchComment}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectFmgreHrEmployeePunchByPunchId" parameterType="Long" resultMap="FmgreHrEmployeePunchResult">
+        <include refid="selectFmgreHrEmployeePunchVo"/>
+        where punch_id = #{punchId}
+    </select>
+
+    <select id="selectFmgreHrEmployeePunchSummaryList" parameterType="map" resultMap="FmgreHrEmployeePunchSummaryResult">
+        SELECT SUM(`work_duration`) as work_duration_sum, DATE_FORMAT(`punch_in_time`, '%Y-%m-%d') as punch_date, COUNT(`punch_id`) as punch_count, 
+            MIN(`punch_in_time`) as min_time, MAX(`punch_out_time`) as max_time FROM `fmgre_hr_employee_punch` WHERE `employee_id` = #{employeeId}
+            AND `punch_in_time` &gt;= #{startTime} AND `punch_in_time` &lt; #{endTime}
+            GROUP BY DATE_FORMAT(`punch_in_time`, '%Y-%m-%d') ORDER BY DATE_FORMAT(`punch_in_time`, '%Y-%m-%d')
+    </select>
+
+    <insert id="insertFmgreHrEmployeePunch" parameterType="FmgreHrEmployeePunch">
+        insert into fmgre_hr_employee_punch
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="punchId != null">punch_id,</if>
+            <if test="employeeId != null">employee_id,</if>
+            <if test="punchInTime != null">punch_in_time,</if>
+            <if test="punchOutTime != null">punch_out_time,</if>
+            <if test="workDuration != null">work_duration,</if>
+            <if test="punchTypeDictid != null">punch_type_dictid,</if>
+            <if test="punchComment != null">punch_comment,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="punchId != null">#{punchId},</if>
+            <if test="employeeId != null">#{employeeId},</if>
+            <if test="punchInTime != null">#{punchInTime},</if>
+            <if test="punchOutTime != null">#{punchOutTime},</if>
+            <if test="workDuration != null">#{workDuration},</if>
+            <if test="punchTypeDictid != null">#{punchTypeDictid},</if>
+            <if test="punchComment != null">#{punchComment},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFmgreHrEmployeePunch" parameterType="FmgreHrEmployeePunch">
+        update fmgre_hr_employee_punch
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="employeeId != null">employee_id = #{employeeId},</if>
+            <if test="punchInTime != null">punch_in_time = #{punchInTime},</if>
+            <if test="punchOutTime != null">punch_out_time = #{punchOutTime},</if>
+            <if test="workDuration != null">work_duration = #{workDuration},</if>
+            <if test="punchTypeDictid != null">punch_type_dictid = #{punchTypeDictid},</if>
+            <if test="punchComment != null">punch_comment = #{punchComment},</if>
+        </trim>
+        where punch_id = #{punchId}
+    </update>
+
+    <delete id="deleteFmgreHrEmployeePunchByPunchId" parameterType="Long">
+        delete from fmgre_hr_employee_punch where punch_id = #{punchId}
+    </delete>
+
+    <delete id="deleteFmgreHrEmployeePunchByPunchIds" parameterType="String">
+        delete from fmgre_hr_employee_punch where punch_id in 
+        <foreach item="punchId" collection="array" open="(" separator="," close=")">
+            #{punchId}
+        </foreach>
+    </delete>
+</mapper>

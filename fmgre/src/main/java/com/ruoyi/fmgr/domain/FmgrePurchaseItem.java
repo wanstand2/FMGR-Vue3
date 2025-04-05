@@ -1,8 +1,12 @@
 package com.ruoyi.fmgr.domain;
 
 import java.math.BigDecimal;
+import java.util.Date;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
@@ -62,6 +66,9 @@ public class FmgrePurchaseItem extends BaseEntity
     @Excel(name = "单项采购总价")
     private BigDecimal itemTotalPrice;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date orderTime;
+    
     private FmgreMaterial materail = new FmgreMaterial();
     
     private FmgreSupplierQuote quote = new FmgreSupplierQuote();
@@ -194,6 +201,14 @@ public class FmgrePurchaseItem extends BaseEntity
 
 	public void setQuote(FmgreSupplierQuote quote) {
 		this.quote = quote;
+	}
+
+	public Date getOrderTime() {
+		return orderTime;
+	}
+
+	public void setOrderTime(Date orderTime) {
+		this.orderTime = orderTime;
 	}
 
 	@Override

@@ -2,6 +2,9 @@ package com.ruoyi.fmgr.mapper;
 
 import java.util.List;
 import java.util.Collection;
+import java.util.Date;
+
+import org.apache.ibatis.annotations.Param;
 
 import com.ruoyi.fmgr.domain.FmgrePurchaseItem;
 import com.ruoyi.fmgr.domain.FmgrePurchaseRequirSummaryBo;
@@ -28,6 +31,8 @@ public interface FmgrePurchaseItemMapper
     public List<FmgrePurchaseRequirSummaryBo> selectFmgrePurchaseRequirSummaryByRequirIds(Collection<Long> requirIds);
 
     public List<FmgrePurchaseOrderSummaryBo> selectFmgrePurchaseOrderSummaryByOrderIds(Collection<Long> orderIds);
+
+    public List<FmgrePurchaseItem> selectFmgrePurchaseMaterialLastSupplier(@Param("materialIds") Collection<Long> materialId, @Param("deptId") Long deptId, @Param("orderTime") Date orderTime);
 
     /**
      * 查询采购记录列表

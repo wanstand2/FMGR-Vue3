@@ -2,13 +2,14 @@ package com.ruoyi.fmgr.service.impl;
 
 import java.math.BigDecimal;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.fmgr.mapper.FmgreFinancePaymentMapper;
+
 import com.ruoyi.fmgr.domain.FmgreFinancePayment;
-import com.ruoyi.fmgr.domain.FmgreFinanceAccountBalance;
-import com.ruoyi.fmgr.service.IFmgreFinancePaymentService;
 import com.ruoyi.fmgr.mapper.FmgreFinanceAccountBalanceMapper;
+import com.ruoyi.fmgr.mapper.FmgreFinancePaymentMapper;
+import com.ruoyi.fmgr.service.IFmgreFinancePaymentService;
 
 /**
  * 付款流水Service业务层处理
@@ -58,30 +59,11 @@ public class FmgreFinancePaymentServiceImpl implements IFmgreFinancePaymentServi
     @Override
     public int insertFmgreFinancePayment(FmgreFinancePayment fmgreFinancePayment)
     {
-        Long accountId = fmgreFinancePayment.getInAccId();
-        if (accountId != null && accountId != 0) {
-            updateAccountBalance(accountId, fmgreFinancePayment.getPaymentAmount());
+        int ret = fmgreFinancePaymentMapper.insertFmgreFinancePayment(fmgreFinancePayment);
+        if (ret > 0) {
+            afterFmgreFinancePayment(fmgreFinancePayment);
         }
-        accountId = fmgreFinancePayment.getOutAccId();
-        if (accountId != null && accountId != 0) {
-            updateAccountBalance(accountId, BigDecimal.ZERO.subtract(fmgreFinancePayment.getPaymentAmount()));
-        }
-        return fmgreFinancePaymentMapper.insertFmgreFinancePayment(fmgreFinancePayment);
-    }
-
-    private void updateAccountBalance(Long accountId, BigDecimal paymentAmount) {
-        BigDecimal outAmount = fmgreFinancePaymentMapper.getPaymentAmountOutSum(accountId);
-        BigDecimal inAmount = fmgreFinancePaymentMapper.getPaymentAmountInSum(accountId);
-        if(outAmount == null) {
-            outAmount = BigDecimal.ZERO;
-        }
-        if(inAmount == null) {
-            inAmount = BigDecimal.ZERO;
-        }
-        FmgreFinanceAccountBalance balance = new FmgreFinanceAccountBalance();
-        balance.setAccountId(accountId);
-        balance.setAccountBalance(inAmount.subtract(outAmount).add(paymentAmount));
-        fmgreFinanceAccountBalanceMapper.updateFmgreFinanceAccountBalance(balance);
+        return ret;
     }
 
     /**
@@ -93,7 +75,51 @@ public class FmgreFinancePaymentServiceImpl implements IFmgreFinancePaymentServi
     @Override
     public int updateFmgreFinancePayment(FmgreFinancePayment fmgreFinancePayment)
     {
-        return fmgreFinancePaymentMapper.updateFmgreFinancePayment(fmgreFinancePayment);
+    	FmgreFinancePayment old = fmgreFinancePaymentMapper.selectFmgreFinancePaymentByPaymentId(fmgreFinancePayment.getPaymentId());
+    	if(fmgreFinancePayment.getPaymentAmount() == null) fmgreFinancePayment.setPaymentAmount(old.getPaymentAmount());
+    	if(fmgreFinancePayment.getPaymentTime() == null) fmgreFinancePayment.setPaymentTime(old.getPaymentTime());
+    	if(fmgreFinancePayment.getPaymentTime() != null && !old.getPaymentTime().equals(fmgreFinancePayment.getPaymentTime())) {
+    		BigDecimal bias = BigDecimal.ZERO.subtract(old.getPaymentAmount());
+    		old.setPaymentAmount(BigDecimal.ZERO);
+    		fmgreFinancePaymentMapper.updateFmgreFinancePayment(old);
+    		FmgreFinancePayment payment = new FmgreFinancePayment();
+            payment.setPaymentId(old.getPaymentId());
+            payment.setOutAccId(old.getOutAccId());
+            payment.setInAccId(old.getInAccId());
+            payment.setPaymentTime(old.getPaymentTime());
+            payment.setPaymentAmount(bias);
+            afterFmgreFinancePayment(payment);
+    	}
+        BigDecimal bias = fmgreFinancePayment.getPaymentAmount().subtract(
+            old.getPaymentAmount());
+        if(fmgreFinancePayment.getInAccId() == null) fmgreFinancePayment.setInAccId(old.getInAccId());
+        if(fmgreFinancePayment.getOutAccId() == null) fmgreFinancePayment.setOutAccId(old.getOutAccId());
+    	int ret = fmgreFinancePaymentMapper.updateFmgreFinancePayment(fmgreFinancePayment);
+        if (ret > 0) {
+            FmgreFinancePayment payment = new FmgreFinancePayment();
+            payment.setPaymentId(old.getPaymentId());
+            payment.setOutAccId(old.getOutAccId());
+            payment.setInAccId(old.getInAccId());
+            payment.setPaymentTime(fmgreFinancePayment.getPaymentTime());
+            payment.setPaymentAmount(bias);
+            afterFmgreFinancePayment(payment);
+        }
+        return ret;
+    }
+
+    private void afterFmgreFinancePayment(FmgreFinancePayment fmgreFinancePayment) {
+        Long inAccId = fmgreFinancePayment.getInAccId();
+        if (inAccId != null && inAccId != 0) {
+        	fmgreFinanceAccountBalanceMapper.updateFmgreFinanceAccountBalanceByAccountId(inAccId);
+            fmgreFinancePaymentMapper.updateFmgreFinancePaymentBanlancesOutInAcc(fmgreFinancePayment);
+            fmgreFinancePaymentMapper.updateFmgreFinancePaymentBanlancesInInAcc(fmgreFinancePayment);
+        }
+        Long outAccId = fmgreFinancePayment.getOutAccId();
+        if (outAccId != null && outAccId != 0) {
+        	fmgreFinanceAccountBalanceMapper.updateFmgreFinanceAccountBalanceByAccountId(outAccId);
+            fmgreFinancePaymentMapper.updateFmgreFinancePaymentBanlancesOutOutAcc(fmgreFinancePayment);
+            fmgreFinancePaymentMapper.updateFmgreFinancePaymentBanlancesInOutAcc(fmgreFinancePayment);
+        }
     }
 
     /**

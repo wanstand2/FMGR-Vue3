@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.fmgr.mapper.FmgreHrEmployeeMapper">
+    
+    <resultMap type="FmgreHrEmployee" id="FmgreHrEmployeeResult">
+        <result property="employeeId"    column="employee_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="employeeCode"    column="employee_code"    />
+        <result property="employeeName"    column="employee_name"    />
+        <result property="employeeSex"    column="employee_sex"    />
+        <result property="mobileNumber"    column="mobile_number"    />
+        <result property="employeeTypeDictid"    column="employee_type_dictid"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="joinTime"    column="join_time"    />
+        <result property="resignTime"    column="resign_time"    />
+    </resultMap>
+
+    <sql id="selectFmgreHrEmployeeVo">
+        select employee_id, user_id, employee_code, employee_name, employee_sex, mobile_number, employee_type_dictid, dept_id, join_time, resign_time from fmgre_hr_employee
+    </sql>
+
+    <select id="selectFmgreHrEmployeeList" parameterType="FmgreHrEmployee" resultMap="FmgreHrEmployeeResult">
+        <include refid="selectFmgreHrEmployeeVo"/>
+        <where>  
+            <if test="employeeId != null "> and employee_id = #{employeeId}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="employeeCode != null  and employeeCode != ''"> and employee_code = #{employeeCode}</if>
+            <if test="employeeName != null  and employeeName != ''"> and employee_name like concat('%', #{employeeName}, '%')</if>
+            <if test="employeeSex != null  and employeeSex != ''"> and employee_sex = #{employeeSex}</if>
+            <if test="mobileNumber != null  and mobileNumber != ''"> and mobile_number = #{mobileNumber}</if>
+            <if test="employeeTypeDictid != null  and employeeTypeDictid != ''"> and employee_type_dictid = #{employeeTypeDictid}</if>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="params.beginJoinTime != null and params.beginJoinTime != '' and params.endJoinTime != null and params.endJoinTime != ''"> and join_time between #{params.beginJoinTime} and #{params.endJoinTime}</if>
+            <if test="params.beginResignTime != null and params.beginResignTime != '' and params.endResignTime != null and params.endResignTime != ''"> and resign_time between #{params.beginResignTime} and #{params.endResignTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectFmgreHrEmployeeByEmployeeId" parameterType="Long" resultMap="FmgreHrEmployeeResult">
+        <include refid="selectFmgreHrEmployeeVo"/>
+        where employee_id = #{employeeId}
+    </select>
+
+    <insert id="insertFmgreHrEmployee" parameterType="FmgreHrEmployee">
+	    <selectKey keyProperty="employeeId" order="AFTER" resultType="java.lang.Long">
+          SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into fmgre_hr_employee
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="employeeId != null">employee_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="employeeCode != null">employee_code,</if>
+            <if test="employeeName != null">employee_name,</if>
+            <if test="employeeSex != null">employee_sex,</if>
+            <if test="mobileNumber != null">mobile_number,</if>
+            <if test="employeeTypeDictid != null">employee_type_dictid,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="joinTime != null">join_time,</if>
+            <if test="resignTime != null">resign_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="employeeId != null">#{employeeId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="employeeCode != null">#{employeeCode},</if>
+            <if test="employeeName != null">#{employeeName},</if>
+            <if test="employeeSex != null">#{employeeSex},</if>
+            <if test="mobileNumber != null">#{mobileNumber},</if>
+            <if test="employeeTypeDictid != null">#{employeeTypeDictid},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="joinTime != null">#{joinTime},</if>
+            <if test="resignTime != null">#{resignTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFmgreHrEmployee" parameterType="FmgreHrEmployee">
+        update fmgre_hr_employee
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="employeeCode != null">employee_code = #{employeeCode},</if>
+            <if test="employeeName != null">employee_name = #{employeeName},</if>
+            <if test="employeeSex != null">employee_sex = #{employeeSex},</if>
+            <if test="mobileNumber != null">mobile_number = #{mobileNumber},</if>
+            <if test="employeeTypeDictid != null">employee_type_dictid = #{employeeTypeDictid},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="joinTime != null">join_time = #{joinTime},</if>
+            <if test="resignTime != null">resign_time = #{resignTime},</if>
+        </trim>
+        where employee_id = #{employeeId}
+    </update>
+
+    <delete id="deleteFmgreHrEmployeeByEmployeeId" parameterType="Long">
+        delete from fmgre_hr_employee where employee_id = #{employeeId}
+    </delete>
+
+    <delete id="deleteFmgreHrEmployeeByEmployeeIds" parameterType="String">
+        delete from fmgre_hr_employee where employee_id in 
+        <foreach item="employeeId" collection="array" open="(" separator="," close=")">
+            #{employeeId}
+        </foreach>
+    </delete>
+</mapper>

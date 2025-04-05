@@ -24,11 +24,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="requirTime != null "> and requir_time = #{requirTime}</if>
             <if test="requirComment != null  and requirComment != ''"> and requir_comment = #{requirComment}</if>
         </where>
+		${params.dataScope}
     </select>
     
     <select id="selectFmgrePurchaseRequirByRequirId" parameterType="Long" resultMap="FmgrePurchaseRequirResult">
         <include refid="selectFmgrePurchaseRequir"/>
         where requir_id = #{requirId}
+		${params.dataScope}
     </select>
 
     <select id="selectFmgrePurchaseRequirListByRequirIds" parameterType="Long[]" resultMap="FmgrePurchaseRequirResult">

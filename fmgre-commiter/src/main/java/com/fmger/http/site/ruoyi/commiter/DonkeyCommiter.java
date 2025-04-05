@@ -152,6 +152,9 @@ public class DonkeyCommiter extends SiteRuoyiCommiter {
 			System.out.println(quote);
 		}
 		
+		if(false)
+		throw new RuntimeException("暂停！");
+		
 		
 		Map<String, List<DonkeyItem>> orderMap = purchases.stream().collect(Collectors.groupingBy(DonkeyItem::getCode1));
 		List<String> ordersSort = orderMap.keySet().stream().sorted().collect(Collectors.toList());
@@ -276,7 +279,7 @@ public class DonkeyCommiter extends SiteRuoyiCommiter {
 					spec.comment = spec.packSize.toString() + unit.unit;
 					spec.packSize = BigDecimal.ONE;
 				} else {
-					throw new RuntimeException("不一致的基本单位：" + unit.unit + " vs " + spec.material.getUnitDictid());
+					throw new RuntimeException("不一致的基本单位："+spec.material.getMaterailName() + " " + unit.unit + " vs " + spec.material.getUnitDictid());
 				}
 			 } else {
 				 spec.packSize = spec.packSize.multiply(conv.amount);
@@ -317,6 +320,7 @@ public class DonkeyCommiter extends SiteRuoyiCommiter {
 	}};
 	private Map<String, Unit> unitMapping = new HashMap<String, Unit>() {{
 		put("斤", new Unit(new BigDecimal("500"), "g"));
+		put("公斤", new Unit(new BigDecimal("1"), "kg"));
 //		put("包", new Unit(new BigDecimal("1"), "SHUANG"));
 		put("片", new Unit(new BigDecimal("1"), "GE"));
 		put("ml", new Unit(new BigDecimal("1"), "mL"));
@@ -327,11 +331,15 @@ public class DonkeyCommiter extends SiteRuoyiCommiter {
 	}};
 	private Map<String, Unit> unitConv = new HashMap<String, Unit>() {{
 		put("kg-g", new Unit(new BigDecimal("1000"), "g"));
+		put("kg-mL", new Unit(new BigDecimal("1000"), "mL"));
 		put("L-mL", new Unit(new BigDecimal("1000"), "mL"));
+		put("L-g", new Unit(new BigDecimal("1000"), "g"));
 		put("GE-ZHI", new Unit(BigDecimal.ONE, "ZHI"));
 		put("TAO-ZHI", new Unit(BigDecimal.ONE, "ZHI"));
 		put("mL-g", new Unit(BigDecimal.ONE, "g"));
 		put("ZHI-SHUANG", new Unit(new BigDecimal("0.5"), "SHUANG"));
+		put("GE-SHUANG", new Unit(new BigDecimal("0.5"), "SHUANG"));
 		put("ZHI-GEN", new Unit(BigDecimal.ONE, "GEN"));
+		put("BA-SHUANG", new Unit(new BigDecimal("1"), "SHUANG"));
 	}};
 }
