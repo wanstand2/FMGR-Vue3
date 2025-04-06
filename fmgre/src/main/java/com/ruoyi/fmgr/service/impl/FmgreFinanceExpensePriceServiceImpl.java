@@ -1,10 +1,13 @@
 package com.ruoyi.fmgr.service.impl;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.fmgr.mapper.FmgreFinanceExpensePriceMapper;
+
+import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.fmgr.domain.FmgreFinanceExpensePrice;
+import com.ruoyi.fmgr.mapper.FmgreFinanceExpensePriceMapper;
 import com.ruoyi.fmgr.service.IFmgreFinanceExpensePriceService;
 
 /**
@@ -38,6 +41,7 @@ public class FmgreFinanceExpensePriceServiceImpl implements IFmgreFinanceExpense
      * @return 费用类目价格
      */
     @Override
+    @DataScope(deptAlias = "d")
     public List<FmgreFinanceExpensePrice> selectFmgreFinanceExpensePriceList(FmgreFinanceExpensePrice fmgreFinanceExpensePrice)
     {
         return fmgreFinanceExpensePriceMapper.selectFmgreFinanceExpensePriceList(fmgreFinanceExpensePrice);

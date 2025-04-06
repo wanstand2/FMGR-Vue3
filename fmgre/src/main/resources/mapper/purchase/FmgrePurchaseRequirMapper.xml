@@ -13,7 +13,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectFmgrePurchaseRequir">
-        select requir_id, dept_id, requir_user_id, requir_time, requir_comment from fmgre_purchase_requir
+        select requir_id, dept_id, requir_user_id, requir_time, requir_comment from fmgre_purchase_requir d
     </sql>
 
     <select id="selectFmgrePurchaseRequirList" parameterType="FmgrePurchaseRequir" resultMap="FmgrePurchaseRequirResult">
@@ -23,14 +23,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="requirUserId != null "> and requir_user_id = #{requirUserId}</if>
             <if test="requirTime != null "> and requir_time = #{requirTime}</if>
             <if test="requirComment != null  and requirComment != ''"> and requir_comment = #{requirComment}</if>
-        </where>
 		${params.dataScope}
+        </where>
     </select>
     
     <select id="selectFmgrePurchaseRequirByRequirId" parameterType="Long" resultMap="FmgrePurchaseRequirResult">
         <include refid="selectFmgrePurchaseRequir"/>
         where requir_id = #{requirId}
-		${params.dataScope}
     </select>
 
     <select id="selectFmgrePurchaseRequirListByRequirIds" parameterType="Long[]" resultMap="FmgrePurchaseRequirResult">

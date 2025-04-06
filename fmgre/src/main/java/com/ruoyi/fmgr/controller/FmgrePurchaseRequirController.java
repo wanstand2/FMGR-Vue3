@@ -55,7 +55,6 @@ public class FmgrePurchaseRequirController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('purchase:requir:list')")
     @GetMapping("/list")
-    @DataScope(deptAlias = "d")
     public TableDataInfo list(FmgrePurchaseRequir fmgrePurchaseRequir)
     {
         startPage();
@@ -72,7 +71,6 @@ public class FmgrePurchaseRequirController extends BaseController
 
     @PreAuthorize("@ss.hasPermi('purchase:requir:list')")
     @GetMapping("/listids")
-    @DataScope(deptAlias = "d")
     public TableDataInfo listByIds(Long[] requirIds)
     {
         startPage();
@@ -86,7 +84,6 @@ public class FmgrePurchaseRequirController extends BaseController
     @PreAuthorize("@ss.hasPermi('purchase:requir:export')")
     @Log(title = "采购需求", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    @DataScope(deptAlias = "d")
     public void export(HttpServletResponse response, FmgrePurchaseRequir fmgrePurchaseRequir)
     {
         List<FmgrePurchaseRequir> list = fmgrePurchaseRequirService.selectFmgrePurchaseRequirList(fmgrePurchaseRequir);
@@ -99,7 +96,6 @@ public class FmgrePurchaseRequirController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('purchase:requir:query')")
     @GetMapping(value = "/{requirId}")
-    @DataScope(deptAlias = "d")
     public AjaxResult getInfo(@PathVariable("requirId") Long requirId)
     {
         FmgrePurchaseRequir fmgrePurchaseRequir = fmgrePurchaseRequirService.selectFmgrePurchaseRequirByRequirId(requirId);

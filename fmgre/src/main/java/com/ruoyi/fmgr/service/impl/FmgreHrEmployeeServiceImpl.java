@@ -1,10 +1,13 @@
 package com.ruoyi.fmgr.service.impl;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.fmgr.mapper.FmgreHrEmployeeMapper;
+
+import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.fmgr.domain.FmgreHrEmployee;
+import com.ruoyi.fmgr.mapper.FmgreHrEmployeeMapper;
 import com.ruoyi.fmgr.service.IFmgreHrEmployeeService;
 
 /**
@@ -38,6 +41,7 @@ public class FmgreHrEmployeeServiceImpl implements IFmgreHrEmployeeService
      * @return 员工
      */
     @Override
+    @DataScope(deptAlias = "d")
     public List<FmgreHrEmployee> selectFmgreHrEmployeeList(FmgreHrEmployee fmgreHrEmployee)
     {
         return fmgreHrEmployeeMapper.selectFmgreHrEmployeeList(fmgreHrEmployee);

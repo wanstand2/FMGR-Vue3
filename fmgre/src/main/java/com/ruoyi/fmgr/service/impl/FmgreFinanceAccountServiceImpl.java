@@ -1,15 +1,18 @@
 package com.ruoyi.fmgr.service.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.fmgr.mapper.FmgreFinanceAccountMapper;
+
+import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.fmgr.domain.FmgreFinanceAccount;
 import com.ruoyi.fmgr.domain.FmgreFinanceAccountBalance;
-import com.ruoyi.fmgr.service.IFmgreFinanceAccountService;
+import com.ruoyi.fmgr.mapper.FmgreFinanceAccountMapper;
 import com.ruoyi.fmgr.service.IFmgreFinanceAccountBalanceService;
-import java.math.BigDecimal;
-import java.util.stream.Collectors;
+import com.ruoyi.fmgr.service.IFmgreFinanceAccountService;
 
 /**
  * 银行账户Service业务层处理
@@ -49,6 +52,7 @@ public class FmgreFinanceAccountServiceImpl implements IFmgreFinanceAccountServi
      * @return 银行账户
      */
     @Override
+    @DataScope(deptAlias = "d")
     public List<FmgreFinanceAccount> selectFmgreFinanceAccountList(FmgreFinanceAccount fmgreFinanceAccount)
     {
         List<FmgreFinanceAccount> accounts = fmgreFinanceAccountMapper.selectFmgreFinanceAccountList(fmgreFinanceAccount);

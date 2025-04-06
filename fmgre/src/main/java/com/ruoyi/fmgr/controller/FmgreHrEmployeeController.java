@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -50,7 +49,6 @@ public class FmgreHrEmployeeController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('hr:employee:list')")
     @GetMapping("/list")
-    @DataScope(deptAlias = "d")
     public TableDataInfo list(FmgreHrEmployee fmgreHrEmployee)
     {
         startPage();
@@ -70,7 +68,6 @@ public class FmgreHrEmployeeController extends BaseController
     @PreAuthorize("@ss.hasPermi('hr:employee:export')")
     @Log(title = "员工", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    @DataScope(deptAlias = "d")
     public void export(HttpServletResponse response, FmgreHrEmployee fmgreHrEmployee)
     {
         List<FmgreHrEmployee> list = fmgreHrEmployeeService.selectFmgreHrEmployeeList(fmgreHrEmployee);
@@ -83,7 +80,6 @@ public class FmgreHrEmployeeController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('hr:employee:query')")
     @GetMapping(value = "/{employeeId}")
-    @DataScope(deptAlias = "d")
     public AjaxResult getInfo(@PathVariable("employeeId") Long employeeId)
     {
         FmgreHrEmployee employee = fmgreHrEmployeeService.selectFmgreHrEmployeeByEmployeeId(employeeId);

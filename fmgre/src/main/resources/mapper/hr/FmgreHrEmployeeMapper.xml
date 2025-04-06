@@ -18,7 +18,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectFmgreHrEmployeeVo">
-        select employee_id, user_id, employee_code, employee_name, employee_sex, mobile_number, employee_type_dictid, dept_id, join_time, resign_time from fmgre_hr_employee
+        select employee_id, user_id, employee_code, employee_name, employee_sex, mobile_number, employee_type_dictid, dept_id, join_time, resign_time from fmgre_hr_employee d
     </sql>
 
     <select id="selectFmgreHrEmployeeList" parameterType="FmgreHrEmployee" resultMap="FmgreHrEmployeeResult">
@@ -34,6 +34,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="deptId != null "> and dept_id = #{deptId}</if>
             <if test="params.beginJoinTime != null and params.beginJoinTime != '' and params.endJoinTime != null and params.endJoinTime != ''"> and join_time between #{params.beginJoinTime} and #{params.endJoinTime}</if>
             <if test="params.beginResignTime != null and params.beginResignTime != '' and params.endResignTime != null and params.endResignTime != ''"> and resign_time between #{params.beginResignTime} and #{params.endResignTime}</if>
+		${params.dataScope}
         </where>
     </select>
     

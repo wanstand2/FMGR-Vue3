@@ -6,9 +6,9 @@ import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -44,7 +44,7 @@ public class PunchCommiter extends SiteRuoyiCommiter {
 		});
 
 		this.refreshEmployees();
-		List<FmgreHrEmployeePunch> eps = new ArrayList<>();
+		LinkedList<FmgreHrEmployeePunch> eps = new LinkedList<>();
 		for(PunchList punch:punches) {
 			FmgreHrEmployeePunch ep = new FmgreHrEmployeePunch();
 			ep.setPunchInTime(Date.from(LocalDateTime.of(punch.date, punch.punchIn.minusHours(8)).toInstant(ZoneOffset.ofHours(0))));

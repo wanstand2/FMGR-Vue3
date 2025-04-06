@@ -17,7 +17,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectFmgreFinanceAccountVo">
-        select account_id, user_id, dept_id, account_dictid, account_name, account_number, bank_id, bank_info, account_alias from fmgre_finance_account
+        select account_id, user_id, dept_id, account_dictid, account_name, account_number, bank_id, bank_info, account_alias from fmgre_finance_account d
     </sql>
 
     <select id="selectFmgreFinanceAccountList" parameterType="FmgreFinanceAccount" resultMap="FmgreFinanceAccountResult">
@@ -31,14 +31,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="bankId != null "> and bank_id = #{bankId}</if>
             <if test="bankInfo != null  and bankInfo != ''"> and bank_info like concat('%', #{bankInfo}, '%')</if>
             <if test="accountAlias != null  and accountAlias != ''"> and account_alias like concat('%', #{accountAlias}, '%')</if>
-        </where>
 		${params.dataScope}
+        </where>
     </select>
     
     <select id="selectFmgreFinanceAccountByAccountId" parameterType="Long" resultMap="FmgreFinanceAccountResult">
         <include refid="selectFmgreFinanceAccountVo"/>
         where account_id = #{accountId}
-		${params.dataScope}
     </select>
 
     <insert id="insertFmgreFinanceAccount" parameterType="FmgreFinanceAccount" useGeneratedKeys="true" keyProperty="accountId">

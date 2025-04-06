@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -58,7 +57,6 @@ public class FmgreFinanceAccountController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('finance:account:list')")
     @GetMapping("/list")
-    @DataScope(deptAlias = "d")
     public TableDataInfo list(FmgreFinanceAccount fmgreFinanceAccount)
     {
         startPage();
@@ -89,7 +87,6 @@ public class FmgreFinanceAccountController extends BaseController
     @PreAuthorize("@ss.hasPermi('finance:account:export')")
     @Log(title = "银行账户", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    @DataScope(deptAlias = "d")
     public void export(HttpServletResponse response, FmgreFinanceAccount fmgreFinanceAccount)
     {
         List<FmgreFinanceAccount> list = fmgreFinanceAccountService.selectFmgreFinanceAccountList(fmgreFinanceAccount);
@@ -102,7 +99,6 @@ public class FmgreFinanceAccountController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('finance:account:query')")
     @GetMapping(value = "/{accountId}")
-    @DataScope(deptAlias = "d")
     public AjaxResult getInfo(@PathVariable("accountId") Long accountId)
     {
         return success(fmgreFinanceAccountService.selectFmgreFinanceAccountByAccountId(accountId));

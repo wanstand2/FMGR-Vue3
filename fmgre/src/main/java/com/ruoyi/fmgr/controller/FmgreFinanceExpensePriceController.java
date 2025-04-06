@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -43,7 +42,6 @@ public class FmgreFinanceExpensePriceController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('finance:expenseprice:list')")
     @GetMapping("/list")
-    @DataScope(deptAlias = "d")
     public TableDataInfo list(FmgreFinanceExpensePrice fmgreFinanceExpensePrice)
     {
         startPage();
@@ -57,7 +55,6 @@ public class FmgreFinanceExpensePriceController extends BaseController
     @PreAuthorize("@ss.hasPermi('finance:expenseprice:export')")
     @Log(title = "费用类目价格", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    @DataScope(deptAlias = "d")
     public void export(HttpServletResponse response, FmgreFinanceExpensePrice fmgreFinanceExpensePrice)
     {
         List<FmgreFinanceExpensePrice> list = fmgreFinanceExpensePriceService.selectFmgreFinanceExpensePriceList(fmgreFinanceExpensePrice);
@@ -70,7 +67,6 @@ public class FmgreFinanceExpensePriceController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('finance:expenseprice:query')")
     @GetMapping(value = "/{priceId}")
-    @DataScope(deptAlias = "d")
     public AjaxResult getInfo(@PathVariable("priceId") Long priceId)
     {
         return success(fmgreFinanceExpensePriceService.selectFmgreFinanceExpensePriceByPriceId(priceId));

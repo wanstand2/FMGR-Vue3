@@ -1,10 +1,13 @@
 package com.ruoyi.fmgr.service.impl;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.fmgr.mapper.FmgrePurchaseRequirMapper;
+
+import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.fmgr.domain.FmgrePurchaseRequir;
+import com.ruoyi.fmgr.mapper.FmgrePurchaseRequirMapper;
 import com.ruoyi.fmgr.service.IFmgrePurchaseRequirService;
 
 /**
@@ -38,6 +41,7 @@ public class FmgrePurchaseRequirServiceImpl implements IFmgrePurchaseRequirServi
      * @return 采购需求
      */
     @Override
+    @DataScope(deptAlias = "d")
     public List<FmgrePurchaseRequir> selectFmgrePurchaseRequirList(FmgrePurchaseRequir fmgrePurchaseRequir)
     {
         return fmgrePurchaseRequirMapper.selectFmgrePurchaseRequirList(fmgrePurchaseRequir);

@@ -43,7 +43,6 @@ public class FmgreFranchiseStoreController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('branch:store:list')")
     @GetMapping("/list")
-    @DataScope(deptAlias = "d")
     public TableDataInfo list(FmgreFranchiseStore fmgreFranchiseStore)
     {
         startPage();
@@ -57,7 +56,6 @@ public class FmgreFranchiseStoreController extends BaseController
     @PreAuthorize("@ss.hasPermi('branch:store:export')")
     @Log(title = "门店", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    @DataScope(deptAlias = "d")
     public void export(HttpServletResponse response, FmgreFranchiseStore fmgreFranchiseStore)
     {
         List<FmgreFranchiseStore> list = fmgreFranchiseStoreService.selectFmgreFranchiseStoreList(fmgreFranchiseStore);

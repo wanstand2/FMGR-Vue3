@@ -15,7 +15,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectFmgreFinanceExpensePriceVo">
-        select price_id, dept_id, expense_id, price_name, price_price, price_comment, price_time from fmgre_finance_expense_price
+        select price_id, dept_id, expense_id, price_name, price_price, price_comment, price_time from fmgre_finance_expense_price d
     </sql>
 
     <select id="selectFmgreFinanceExpensePriceList" parameterType="FmgreFinanceExpensePrice" resultMap="FmgreFinanceExpensePriceResult">
@@ -28,14 +28,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="pricePrice != null "> and price_price = #{pricePrice}</if>
             <if test="priceComment != null  and priceComment != ''"> and price_comment like concat('%', #{priceComment}, '%')</if>
             <if test="params.beginPriceTime != null and params.beginPriceTime != '' and params.endPriceTime != null and params.endPriceTime != ''"> and price_time between #{params.beginPriceTime} and #{params.endPriceTime}</if>
-        </where>
 		${params.dataScope}
+        </where>
     </select>
     
     <select id="selectFmgreFinanceExpensePriceByPriceId" parameterType="Long" resultMap="FmgreFinanceExpensePriceResult">
         <include refid="selectFmgreFinanceExpensePriceVo"/>
         where price_id = #{priceId}
-		${params.dataScope}
     </select>
 
     <insert id="insertFmgreFinanceExpensePrice" parameterType="FmgreFinanceExpensePrice">
