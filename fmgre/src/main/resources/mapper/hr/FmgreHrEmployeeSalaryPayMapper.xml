@@ -22,6 +22,29 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <sql id="selectFmgreHrEmployeeSalaryPayVo">
         select pay_id, payment_id, employee_id, pay_time, start_time, end_time, pay_name, pay_comment, pieriod_work_day, employee_work_time, time_salary, adjust_salary from fmgre_hr_employee_salary_pay
     </sql>
+    
+    <resultMap type="FmgreFinanceStatisticResult" id="FmgreFinanceStatisticResultResult">
+        <result property="depId"    column="dept_id"    />
+        <result property="month"    column="DATE_FORMAT(start_time, '%Y-%m')"    />
+        <result property="subTotal"    column="SUM(`time_salary`)+SUM(`adjust_salary`)"    />
+    </resultMap>
+
+    <select id="statisticFmgreHrEmployeeSalaryPayByMonth" parameterType="map" resultMap="FmgreFinanceStatisticResultResult">
+        SELECT SUM(`time_salary`)+SUM(`adjust_salary`), dept_id, DATE_FORMAT(start_time, '%Y-%m')
+        FROM `fmgre_hr_employee_salary_pay` AS s LEFT JOIN `fmgre_hr_employee` AS e ON s.employee_id = e.employee_id
+        WHERE `start_time` &gt;= #{startTime} and `start_time` &lt; #{endTime} 
+        <if test="types != null and types.length > 0">
+        AND employee_type_dictid IN 
+            <foreach item="type" collection="types" open="(" separator="," close=")">
+                #{type}
+            </foreach>
+        </if>
+        AND dept_id IN 
+        <foreach item="deptId" collection="deptIds" open="(" separator="," close=")">
+            #{deptId}
+        </foreach>
+         GROUP BY DATE_FORMAT(start_time, '%Y-%m'), dept_id;
+    </select>
 
     <select id="selectFmgreHrEmployeeSalaryPayList" parameterType="FmgreHrEmployeeSalaryPay" resultMap="FmgreHrEmployeeSalaryPayResult">
         <include refid="selectFmgreHrEmployeeSalaryPayVo"/>
@@ -58,7 +81,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <insert id="insertFmgreHrEmployeeSalaryPay" parameterType="FmgreHrEmployeeSalaryPay">
         insert into fmgre_hr_employee_salary_pay
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="payId != null">pay_id,</if>
             <if test="paymentId != null">payment_id,</if>
             <if test="employeeId != null">employee_id,</if>
             <if test="payTime != null">pay_time,</if>
@@ -72,7 +94,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="adjustSalary != null">adjust_salary,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="payId != null">#{payId},</if>
             <if test="paymentId != null">#{paymentId},</if>
             <if test="employeeId != null">#{employeeId},</if>
             <if test="payTime != null">#{payTime},</if>

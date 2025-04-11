@@ -11,6 +11,7 @@ import com.fmger.http.site.ruoyi.SiteRuoyiFast;
 import com.ruoyi.common.core.domain.entity.SysDictData;
 import com.ruoyi.fmgr.domain.FmgreFinanceAccount;
 import com.ruoyi.fmgr.domain.FmgreMaterial;
+import com.ruoyi.fmgr.domain.FmgrePurchaseRequir;
 import com.ruoyi.fmgr.domain.FmgreSupplier;
 import com.ruoyi.fmgr.domain.FmgreSupplierBrand;
 import com.ruoyi.fmgr.domain.FmgreSupplierQuote;

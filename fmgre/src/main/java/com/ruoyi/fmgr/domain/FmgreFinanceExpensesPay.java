@@ -1,8 +1,12 @@
 package com.ruoyi.fmgr.domain;
 
 import java.math.BigDecimal;
+import java.util.Date;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
@@ -48,6 +52,11 @@ public class FmgreFinanceExpensesPay extends BaseEntity
     @Excel(name = "支付说明")
     private String payComment;
 
+    /** 发生时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "发生时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
+    private Date payTime;
+    
     public void setExpensesId(Long payId) 
     {
         this.payId = payId;
@@ -129,7 +138,15 @@ public class FmgreFinanceExpensesPay extends BaseEntity
         return payComment;
     }
 
-    @Override
+    public Date getPayTime() {
+		return payTime;
+	}
+
+	public void setPayTime(Date payTime) {
+		this.payTime = payTime;
+	}
+
+	@Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("payId", getExpensesId())
@@ -140,6 +157,7 @@ public class FmgreFinanceExpensesPay extends BaseEntity
             .append("paySubtotal", getPaySubtotal())
             .append("payName", getPayName())
             .append("payComment", getPayComment())
+            .append("payTime", getPayTime())
             .toString();
     }
 }

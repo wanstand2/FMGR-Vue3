@@ -150,11 +150,14 @@ public class FmgreFinancePaymentController extends BaseController
             if(fmgreFinancePaymentPayBo.getOrderIds().size() < 2) {
                 fmgreFinancePaymentPayBo.setComment("支付订单："+order.getOrderCode());
             } else {
-                fmgreFinancePaymentPayBo.setComment("支付多个订单（"+fmgreFinancePaymentPayBo.getOrderIds().size()+"）："+order.getOrderCode());
+                fmgreFinancePaymentPayBo.setComment("支付多个订单："+order.getOrderCode());
             }
         }
-        fmgreFinancePayment.setPaymentComment(fmgreFinancePaymentPayBo.getComment() == null ? "订单付款" : fmgreFinancePaymentPayBo.getComment());
+        if(fmgreFinancePaymentPayBo.getOrderIds().size() > 1) {
+            fmgreFinancePaymentPayBo.setComment(fmgreFinancePaymentPayBo.getComment() + "-订单" + fmgreFinancePaymentPayBo.getOrderIds().size() + "个");
+        }
         fmgreFinancePayment.setUserId(getUserId());
+        fmgreFinancePayment.setPaymentComment(fmgreFinancePaymentPayBo.getComment());
         this._add(fmgreFinancePayment);
         if(fmgreFinancePaymentPayBo.getOrderIds().size() > 1) {
             fmgrePurchaseOrderService.updateFmgrePurchaseOrderPaymentId(fmgreFinancePaymentPayBo.getOrderIds(), fmgreFinancePayment.getPaymentId());

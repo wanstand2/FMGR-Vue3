@@ -68,6 +68,9 @@ public class FmgrePurchaseItem extends BaseEntity
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date orderTime;
+
+    @Excel(name = "单项采购说明")
+    private String itemComment;
     
     private FmgreMaterial materail = new FmgreMaterial();
     
@@ -211,6 +214,14 @@ public class FmgrePurchaseItem extends BaseEntity
 		this.orderTime = orderTime;
 	}
 
+	public String getItemComment() {
+		return itemComment;
+	}
+
+	public void setItemComment(String itemComment) {
+		this.itemComment = itemComment;
+	}
+
 	@Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -227,6 +238,7 @@ public class FmgrePurchaseItem extends BaseEntity
             .append("supplierId", getSupplierId())
             .append("itemTotalPrice", getItemTotalPrice())
             .append("materail", getMaterail())
+            .append("itemComment", getItemComment())
             .append("quote", getQuote())
             .toString();
     }

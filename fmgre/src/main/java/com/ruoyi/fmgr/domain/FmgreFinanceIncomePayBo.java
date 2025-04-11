@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-public class FmgreFinanceExpensesPayBo extends FmgreFinanceExpensesPay {
+public class FmgreFinanceIncomePayBo extends FmgreFinanceIncomePay {
     
     private Long accountId;
     

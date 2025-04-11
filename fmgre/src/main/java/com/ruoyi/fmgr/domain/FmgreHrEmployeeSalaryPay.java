@@ -68,7 +68,7 @@ public class FmgreHrEmployeeSalaryPay extends BaseEntity
     /** 发放说明 */
     @Excel(name = "发放说明")
     private String payComment;
-
+    
     public void setPayId(Long payId) 
     {
         this.payId = payId;

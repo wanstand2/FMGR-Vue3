@@ -18,6 +18,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="supplierId"    column="supplier_id"    />
         <result property="itemTotalPrice"    column="item_total_price"    />
         <result property="orderTime"    column="order_time"    />
+        <result property="itemComment"    column="item_comment"    />
         <result property="materail.materailTypeDictid"    column="materail_type_dictid"    />
         <result property="materail.materailCode"    column="materail_code"    />
         <result property="materail.materailName"    column="materail_name"    />
@@ -48,6 +49,32 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="orderId"    column="order_id"    />
         <result property="itemNum"    column="item_num"    />
     </resultMap>
+    
+    <resultMap type="FmgreFinanceStatisticResult" id="FmgreFinanceStatisticResultResult">
+        <result property="depId"    column="dept_id"    />
+        <result property="month"    column="DATE_FORMAT(r.requir_time, '%Y-%m')"    />
+        <result property="subTotal"    column="SUM(`item_total_price`)"    />
+    </resultMap>
+
+    <select id="statisticFmgrePurchaseItemByMonth" parameterType="map" resultMap="FmgreFinanceStatisticResultResult">
+        SELECT SUM(`item_total_price`), dept_id, DATE_FORMAT(r.requir_time, '%Y-%m')
+        FROM `fmgre_purchase_item` AS i LEFT JOIN `fmgre_purchase_requir` AS r ON i.requir_id = r.requir_id 
+        <if test="types != null and types.length > 0">
+            LEFT JOIN `fmgre_material` AS m ON m.materail_id = i.materail_id 
+        </if>
+        WHERE r.requir_time &gt;= #{startTime} and r.requir_time &lt; #{endTime} 
+        <if test="types != null and types.length > 0">
+        AND materail_type_dictid IN 
+            <foreach item="type" collection="types" open="(" separator="," close=")">
+                #{type}
+            </foreach>
+        </if>
+        AND dept_id IN 
+        <foreach item="deptId" collection="deptIds" open="(" separator="," close=")">
+            #{deptId}
+        </foreach>
+         GROUP BY DATE_FORMAT(r.requir_time, '%Y-%m'), dept_id;
+    </select>
 
     <sql id="selectFmgrePurchaseItemVo">
         select 
@@ -75,6 +102,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="orderId != null "> and order_id = #{orderId}</if>
             <if test="supplierId != null "> and i.supplier_id = #{supplierId}</if>
             <if test="materailId != null "> and materail_id = #{materailId}</if>
+            <if test="itemComment != null  and itemComment != ''"> and item_comment like concat('%', #{itemComment}, '%')</if>
             <if test="params.supplierIdNoneZero != null  and params.supplierIdNoneZero != ''"> and i.supplier_id > 0</if>
         </where>
     </select>
@@ -127,6 +155,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="supplierId != null">supplier_id,</if>
             <if test="itemTotalPrice != null">item_total_price,</if>
             <if test="orderUnitDictid != null">order_unit_dictid,</if>
+            <if test="itemComment != null">item_comment,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="requirId != null">#{requirId},</if>
@@ -140,6 +169,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="supplierId != null">#{supplierId},</if>
             <if test="itemTotalPrice != null">#{itemTotalPrice},</if>
             <if test="orderUnitDictid != null">#{orderUnitDictid},</if>
+            <if test="itemComment != null">#{itemComment},</if>
          </trim>
     </insert>
 
@@ -157,6 +187,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="supplierId != null">supplier_id = #{supplierId},</if>
             <if test="itemTotalPrice != null">item_total_price = #{itemTotalPrice},</if>
             <if test="orderUnitDictid != null">order_unit_dictid = #{orderUnitDictid},</if>
+            <if test="itemComment != null">item_comment = #{itemComment},</if>
         </trim>
         where item_id = #{itemId}
     </update>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.fmgr.mapper.FmgreFinanceIncomePayMapper">
+    
+    <resultMap type="FmgreFinanceIncomePay" id="FmgreFinanceIncomePayResult">
+        <result property="incomeId"    column="income_id"    />
+        <result property="billId"    column="bill_id"    />
+        <result property="paymentId"    column="payment_id"    />
+        <result property="incomeTypeDictid"    column="income_type_dictid"    />
+        <result property="incomeSubtotal"    column="income_subtotal"    />
+        <result property="incomeName"    column="income_name"    />
+        <result property="incomeComment"    column="income_comment"    />
+        <result property="incomeTime"    column="income_time"    />
+        <result property="deptId"    column="dept_id"    />
+    </resultMap>
+
+    <resultMap type="FmgreFinanceIncomePayBo" id="FmgreFinanceIncomePayBoResult">
+        <result property="incomeId"    column="income_id"    />
+        <result property="billId"    column="bill_id"    />
+        <result property="paymentId"    column="payment_id"    />
+        <result property="incomeTypeDictid"    column="income_type_dictid"    />
+        <result property="incomeSubtotal"    column="income_subtotal"    />
+        <result property="incomeName"    column="income_name"    />
+        <result property="incomeComment"    column="income_comment"    />
+        <result property="incomeTime"    column="income_time"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="accountId"    column="in_acc_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="paymentTime"    column="payment_time"    />
+    </resultMap>
+    
+    <resultMap type="FmgreFinanceStatisticResult" id="FmgreFinanceStatisticResultResult">
+        <result property="depId"    column="dept_id"    />
+        <result property="month"    column="DATE_FORMAT(income_time, '%Y-%m')"    />
+        <result property="subTotal"    column="SUM(`income_subtotal`)"    />
+    </resultMap>
+
+    <select id="statisticFmgreFinanceIncomePayByMonth" parameterType="map" resultMap="FmgreFinanceStatisticResultResult">
+        SELECT SUM(`income_subtotal`), dept_id, DATE_FORMAT(income_time, '%Y-%m') 
+        FROM `fmgre_finance_income_pay` WHERE `income_time` &gt;= #{startTime} and `income_time` &lt; #{endTime} 
+        <if test="types != null and types.length > 0">
+        AND income_type_dictid IN 
+            <foreach item="type" collection="types" open="(" separator="," close=")">
+                #{type}
+            </foreach>
+        </if>
+        AND dept_id IN 
+        <foreach item="deptId" collection="deptIds" open="(" separator="," close=")">
+            #{deptId}
+        </foreach>
+         GROUP BY DATE_FORMAT(income_time, '%Y-%m'), dept_id;
+    </select>
+
+    <sql id="selectFmgreFinanceIncomePayVo">
+        select income_id, bill_id, payment_id, income_type_dictid, income_subtotal, income_name, income_comment, income_time, dept_id from fmgre_finance_income_pay
+    </sql>
+
+    <sql id="selectFmgreFinanceIncomePayDisplayVo">
+        select income_id, bill_id, i.payment_id, income_type_dictid, income_subtotal, income_name, income_comment, income_time, dept_id, p.in_acc_id, p.user_id, p.payment_time
+        from fmgre_finance_income_pay i left join fmgre_finance_payment as p on i.payment_id = p.payment_id
+    </sql>
+
+    <select id="selectFmgreFinanceIncomePayList" parameterType="FmgreFinanceIncomePay" resultMap="FmgreFinanceIncomePayBoResult">
+        <include refid="selectFmgreFinanceIncomePayDisplayVo"/>
+        <where>  
+            <if test="incomeId != null "> and income_id = #{incomeId}</if>
+            <if test="billId != null "> and bill_id = #{billId}</if>
+            <if test="paymentId != null "> and payment_id = #{paymentId}</if>
+            <if test="incomeTypeDictid != null "> and income_type_dictid = #{incomeTypeDictid}</if>
+            <if test="incomeSubtotal != null "> and income_subtotal = #{incomeSubtotal}</if>
+            <if test="incomeName != null  and incomeName != ''"> and income_name like concat('%', #{incomeName}, '%')</if>
+            <if test="incomeComment != null  and incomeComment != ''"> and income_comment like concat('%', #{incomeComment}, '%')</if>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="params.beginIncomeTime != null and params.beginIncomeTime != '' and params.endIncomeTime != null and params.endIncomeTime != ''"> and income_time between #{params.beginIncomeTime} and #{params.endIncomeTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectFmgreFinanceIncomePayByIncomeId" parameterType="Long" resultMap="FmgreFinanceIncomePayBoResult">
+        <include refid="selectFmgreFinanceIncomePayDisplayVo"/>
+        where income_id = #{incomeId}
+    </select>
+
+    <insert id="insertFmgreFinanceIncomePay" parameterType="FmgreFinanceIncomePay">
+	    <selectKey keyProperty="incomeId" order="AFTER" resultType="java.lang.Long">
+          SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into fmgre_finance_income_pay
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="incomeId != null">income_id,</if>
+            <if test="billId != null">bill_id,</if>
+            <if test="paymentId != null">payment_id,</if>
+            <if test="incomeTypeDictid != null">income_type_dictid,</if>
+            <if test="incomeSubtotal != null">income_subtotal,</if>
+            <if test="incomeName != null">income_name,</if>
+            <if test="incomeComment != null">income_comment,</if>
+            <if test="incomeTime != null">income_time,</if>
+            <if test="deptId != null">dept_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="incomeId != null">#{incomeId},</if>
+            <if test="billId != null">#{billId},</if>
+            <if test="paymentId != null">#{paymentId},</if>
+            <if test="incomeTypeDictid != null">#{incomeTypeDictid},</if>
+            <if test="incomeSubtotal != null">#{incomeSubtotal},</if>
+            <if test="incomeName != null">#{incomeName},</if>
+            <if test="incomeComment != null">#{incomeComment},</if>
+            <if test="incomeTime != null">#{incomeTime},</if>
+            <if test="deptId != null">#{deptId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFmgreFinanceIncomePay" parameterType="FmgreFinanceIncomePay">
+        update fmgre_finance_income_pay
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="billId != null">bill_id = #{billId},</if>
+            <if test="paymentId != null">payment_id = #{paymentId},</if>
+            <if test="incomeTypeDictid != null">income_type_dictid = #{incomeTypeDictid},</if>
+            <if test="incomeSubtotal != null">income_subtotal = #{incomeSubtotal},</if>
+            <if test="incomeName != null">income_name = #{incomeName},</if>
+            <if test="incomeComment != null">income_comment = #{incomeComment},</if>
+            <if test="incomeTime != null">income_time = #{incomeTime},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+        </trim>
+        where income_id = #{incomeId}
+    </update>
+
+    <delete id="deleteFmgreFinanceIncomePayByIncomeId" parameterType="Long">
+        delete from fmgre_finance_income_pay where income_id = #{incomeId}
+    </delete>
+
+    <delete id="deleteFmgreFinanceIncomePayByIncomeIds" parameterType="String">
+        delete from fmgre_finance_income_pay where income_id in 
+        <foreach item="incomeId" collection="array" open="(" separator="," close=")">
+            #{incomeId}
+        </foreach>
+    </delete>
+</mapper>

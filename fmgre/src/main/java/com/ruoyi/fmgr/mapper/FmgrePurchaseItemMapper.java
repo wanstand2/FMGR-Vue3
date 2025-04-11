@@ -6,6 +6,7 @@ import java.util.Date;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.ruoyi.fmgr.domain.FmgreFinanceStatisticResult;
 import com.ruoyi.fmgr.domain.FmgrePurchaseItem;
 import com.ruoyi.fmgr.domain.FmgrePurchaseRequirSummaryBo;
 import com.ruoyi.fmgr.domain.FmgrePurchaseOrderSummaryBo;
@@ -73,4 +74,6 @@ public interface FmgrePurchaseItemMapper
      * @return 结果
      */
     public int deleteFmgrePurchaseItemByItemIds(Long[] itemIds);
+
+	public List<FmgreFinanceStatisticResult> statisticFmgrePurchaseItemByMonth(@Param("deptIds") Long[] deptIds, @Param("types") String[] types, @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 }

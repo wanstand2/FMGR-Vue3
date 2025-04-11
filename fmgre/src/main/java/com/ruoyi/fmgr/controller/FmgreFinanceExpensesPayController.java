@@ -123,8 +123,8 @@ public class FmgreFinanceExpensesPayController extends BaseController
         }
     	payment.setPaymentComment("支付费用:"+fmgreFinanceExpensesPay.getPayName());
     	payment.setPaymentAmount(fmgreFinanceExpensesPay.getPaySubtotal());
-    	if(fmgreFinanceExpensesPay.getPayTime() != null) {
-    		payment.setPaymentTime(fmgreFinanceExpensesPay.getPayTime());
+    	if(fmgreFinanceExpensesPay.getPaymentTime() != null) {
+    		payment.setPaymentTime(fmgreFinanceExpensesPay.getPaymentTime());
     	} else {
     		payment.setPaymentTime(new Date());
     	}

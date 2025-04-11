@@ -13,6 +13,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="paySubtotal"    column="pay_subtotal"    />
         <result property="payName"    column="pay_name"    />
         <result property="payComment"    column="pay_comment"    />
+        <result property="payTime"    column="pay_time"    />
     </resultMap>
 
     <resultMap type="FmgreFinanceExpensesPayBo" id="FmgreFinanceExpensesPayBoResult">
@@ -24,17 +25,41 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="paySubtotal"    column="pay_subtotal"    />
         <result property="payName"    column="pay_name"    />
         <result property="payComment"    column="pay_comment"    />
+        <result property="payTime"    column="pay_time"    />
         <result property="accountId"    column="out_acc_id"    />
         <result property="userId"    column="user_id"    />
-        <result property="payTime"    column="payment_time"    />
+        <result property="paymentTime"    column="payment_time"    />
+    </resultMap>
+    
+    <resultMap type="FmgreFinanceStatisticResult" id="FmgreFinanceStatisticResultResult">
+        <result property="depId"    column="dept_id"    />
+        <result property="month"    column="DATE_FORMAT(pay_time, '%Y-%m')"    />
+        <result property="subTotal"    column="SUM(`pay_subtotal`)"    />
     </resultMap>
 
+    <select id="statisticFmgreFinanceExpensesPayByMonth" parameterType="map" resultMap="FmgreFinanceStatisticResultResult">
+        SELECT SUM(`pay_subtotal`), dept_id, DATE_FORMAT(pay_time, '%Y-%m') 
+        FROM `fmgre_finance_expenses_pay` AS p LEFT JOIN `fmgre_finance_expense_price` AS r ON p.price_id = r.price_id LEFT JOIN `fmgre_finance_expense` AS e ON r.expense_id = e.expense_id
+        WHERE `pay_time` &gt;= #{startTime} and `pay_time` &lt; #{endTime} 
+        <if test="types != null and types.length > 0">
+        AND expense_type_dictid IN 
+            <foreach item="type" collection="types" open="(" separator="," close=")">
+                #{type}
+            </foreach>
+        </if>
+        AND dept_id IN 
+        <foreach item="deptId" collection="deptIds" open="(" separator="," close=")">
+            #{deptId}
+        </foreach>
+         GROUP BY DATE_FORMAT(pay_time, '%Y-%m'), dept_id;
+    </select>
+
     <sql id="selectFmgreFinanceExpensesPayVo">
-        select expense_id, payment_id, pay_id, price_id, pay_amount, pay_subtotal, pay_name, pay_comment from fmgre_finance_expenses_pay
+        select expense_id, payment_id, pay_id, price_id, pay_amount, pay_subtotal, pay_name, pay_comment, pay_time from fmgre_finance_expenses_pay
     </sql>
 
     <sql id="selectFmgreFinanceExpensesPayDisplayVo">
-        select expense_id, e.payment_id, pay_id, price_id, pay_amount, pay_subtotal, pay_name, pay_comment, p.out_acc_id, p.user_id, p.payment_time
+        select expense_id, e.payment_id, pay_id, price_id, pay_amount, pay_subtotal, pay_name, pay_comment, pay_time, p.out_acc_id, p.user_id, p.payment_time
         from fmgre_finance_expenses_pay e left join fmgre_finance_payment as p on e.payment_id = p.payment_id
     </sql>
 
@@ -48,6 +73,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="paySubtotal != null "> and pay_subtotal = #{paySubtotal}</if>
             <if test="payName != null  and payName != ''"> and pay_name like concat('%', #{payName}, '%')</if>
             <if test="payComment != null  and payComment != ''"> and pay_comment = #{payComment}</if>
+            <if test="payTime != null  and payTime != ''"> and pay_time = #{payTime}</if>
         </where>
     </select>
     
@@ -69,6 +95,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="paySubtotal != null">pay_subtotal,</if>
             <if test="payName != null">pay_name,</if>
             <if test="payComment != null">pay_comment,</if>
+            <if test="payTime != null">pay_time,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="expenseId != null">#{expenseId},</if>
@@ -78,6 +105,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="paySubtotal != null">#{paySubtotal},</if>
             <if test="payName != null">#{payName},</if>
             <if test="payComment != null">#{payComment},</if>
+            <if test="payTime != null">#{payTime},</if>
          </trim>
     </insert>
 
@@ -91,6 +119,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="paySubtotal != null">pay_subtotal = #{paySubtotal},</if>
             <if test="payName != null">pay_name = #{payName},</if>
             <if test="payComment != null">pay_comment = #{payComment},</if>
+            <if test="payTime != null">pay_time = #{payTime},</if>
         </trim>
         where pay_id = #{payId}
     </update>

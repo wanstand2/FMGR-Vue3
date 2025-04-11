@@ -1,9 +1,13 @@
 package com.ruoyi.fmgr.mapper;
 
+import java.util.Date;
 import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
 
 import com.ruoyi.fmgr.domain.FmgreFinanceExpensesPay;
 import com.ruoyi.fmgr.domain.FmgreFinanceExpensesPayBo;
+import com.ruoyi.fmgr.domain.FmgreFinanceStatisticResult;
 
 /**
  * 费用支付Mapper接口
@@ -60,4 +64,6 @@ public interface FmgreFinanceExpensesPayMapper
      * @return 结果
      */
     public int deleteFmgreFinanceExpensesPayByPayIds(Long[] payIds);
+
+    public List<FmgreFinanceStatisticResult> statisticFmgreFinanceExpensesPayByMonth(@Param("deptIds") Long[] deptIds, @Param("types") String[] types, @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 }

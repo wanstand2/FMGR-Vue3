@@ -94,6 +94,16 @@ public class CSVImport<T> {
 			
 	};
 	
+	public static IConvert<LocalDate> localDate2 = new IConvert<LocalDate>() {
+
+		@Override
+		public LocalDate conv(String s) {
+			String[] ss = s.trim().split("月");
+			return LocalDate.of(2025, Integer.valueOf(ss[0]), Integer.valueOf(ss[1].replace("日","")));
+		}
+			
+	};
+	
 	public static IConvert<LocalTime> localTime1 = new IConvert<LocalTime>() {
 
 		@Override

@@ -176,6 +176,9 @@ public class DonkeyCommiter extends SiteRuoyiCommiter {
 					_item.setSupplierId(supplier.getSupplierId());
 					_item.setRequirNum(item.Num);
 					_item.setRequirUnitDictid(item.spec.packUnitDictid);
+					if(!item.material.getMaterailName().equals(item.itemName)) {
+						_item.setItemComment(item.itemName);
+					}
 					_items.add(_item);
 				}
 				requir.setRequirItems(_items);
@@ -224,6 +227,12 @@ public class DonkeyCommiter extends SiteRuoyiCommiter {
 					order.getItems().add(bo);
 				}
 				sf.submitPurchaseOrder(order);
+			}
+			try {
+				Thread.sleep(50L);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}
@@ -325,6 +334,7 @@ public class DonkeyCommiter extends SiteRuoyiCommiter {
 		put("片", new Unit(new BigDecimal("1"), "GE"));
 		put("ml", new Unit(new BigDecimal("1"), "mL"));
 		put("支", new Unit(new BigDecimal("1"), "JUAN"));
+		put("板", new Unit(new BigDecimal("1"), "ZHI"));
 	}};
 	private Map<String, String> packMapping = new HashMap<String, String>() {{
 		put("枚", "个");

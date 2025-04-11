@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.ruoyi.fmgr.domain.FmgreFinanceStatisticResult;
 import com.ruoyi.fmgr.domain.FmgreHrEmployeeSalaryPay;
 
 /**
@@ -64,4 +65,6 @@ public interface FmgreHrEmployeeSalaryPayMapper
     public int deleteFmgreHrEmployeeSalaryPayByPayIds(Long[] payIds);
 
 	public List<FmgreHrEmployeeSalaryPay> selectFmgreHrEmployeeSalaryPayByEDS(@Param("employeeIds") Long[] employeeIds, @Param("dates") Date[] dates);
+
+	public List<FmgreFinanceStatisticResult> statisticFmgreHrEmployeeSalaryPayByMonth(@Param("deptIds") Long[] deptIds, @Param("types") String[] types, @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 }
